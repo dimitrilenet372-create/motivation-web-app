@@ -4,312 +4,274 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Perfect Day</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <!-- ═══════════════════════ SCREEN 1 — SPLASH ═══════════════════════ -->
-  <div class="screen active" id="screen-splash">
-    <div class="splash-layout">
-      <div class="splash-text-block">
-        <h1 class="logo-title">Perfect day</h1>
-        <p class="logo-body">Perfect Day est l'application idéale pour transformer chaque journée en une opportunité de progrès personnel. Que vous souhaitiez améliorer votre bien-être, augmenter votre productivité.</p>
-      </div>
-      <div class="sun-scene" id="sun-scene">
-        <div class="sun-outer" id="sun-outer">
-          <div class="sun-inner" id="sun-inner">
-            <div class="sun-dot" id="sun-dot"></div>
-          </div>
+  <!-- NAV -->
+  <nav class="nav" id="nav">
+    <a class="nav-logo" href="#">
+      <div class="nav-sun">
+        <div class="nav-sun-inner">
+          <div class="nav-sun-dot"></div>
         </div>
       </div>
-      <button class="btn-dark" id="btn-start">On commence !</button>
+      <span>Perfect day</span>
+    </a>
+    <div class="nav-links">
+      <a href="#features">Fonctionnalités</a>
+      <a href="#how">Comment ça marche</a>
+      <a href="#pricing">Tarifs</a>
     </div>
-    <canvas id="transition-canvas"></canvas>
+    <a href="#start" class="btn-nav">On commence !</a>
+    <button class="burger" id="burger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <div class="mobile-menu hidden" id="mobile-menu">
+    <a href="#features" class="mm-link">Fonctionnalités</a>
+    <a href="#how"      class="mm-link">Comment ça marche</a>
+    <a href="#pricing"  class="mm-link">Tarifs</a>
+    <a href="#start"    class="mm-link mm-cta">On commence !</a>
   </div>
 
-  <!-- ═══════════════════════ SCREEN 2 — ONBOARDING ═══════════════════════ -->
-  <div class="screen" id="screen-onboard">
-    <div class="onboard-layout">
-      <div class="onboard-header">
-        <div>
-          <h2 class="onboard-title">What did you want<br>to track?</h2>
-          <p class="onboard-sub">Choose some challenges</p>
-        </div>
-        <button class="btn-next" id="btn-next">Next →</button>
+  <!-- ══════════════ HERO ══════════════ -->
+  <section class="hero" id="hero">
+    <div class="hero-inner">
+      <div class="hero-text" data-reveal>
+        <h1 class="hero-title">Perfect<br><em>day</em></h1>
+        <p class="hero-body">
+          Perfect Day est l'application idéale pour transformer chaque journée en une opportunité de progrès personnel. Que vous souhaitiez améliorer votre bien-être, augmenter votre productivité.
+        </p>
+        <a href="#start" class="btn-dark hero-btn">On commence !</a>
       </div>
-      <div class="category-grid" id="category-grid">
-        <div class="cat-card selected" data-cat="sport" style="--bg:#2C3E50">
-          <span class="cat-emoji">🏋️</span><span class="cat-name">Sport</span>
+      <div class="hero-visual" data-reveal data-delay="0.15">
+        <div class="sun-wrap" id="sun-wrap">
+          <div class="sun-outer" id="sun-outer">
+            <div class="sun-inner">
+              <div class="sun-dot"></div>
+            </div>
+          </div>
         </div>
-        <div class="cat-card" data-cat="business" style="--bg:#34495E">
-          <span class="cat-emoji">💼</span><span class="cat-name">Business</span>
-        </div>
-        <div class="cat-card selected" data-cat="meditation" style="--bg:#1a1a2e">
-          <span class="cat-emoji">🧘</span><span class="cat-name">Méditation</span>
-        </div>
-        <div class="cat-card" data-cat="goals" style="--bg:#2d3436">
-          <span class="cat-emoji">🎯</span><span class="cat-name">Goals</span>
-        </div>
-        <div class="cat-card" data-cat="running" style="--bg:#3d2c1e">
-          <span class="cat-emoji">🏃</span><span class="cat-name">Running</span>
-        </div>
-        <div class="cat-card" data-cat="lecture" style="--bg:#1a2a1a">
-          <span class="cat-emoji">📚</span><span class="cat-name">Lecture</span>
-        </div>
-        <div class="cat-card" data-cat="velo" style="--bg:#2a1a2e">
-          <span class="cat-emoji">🚴</span><span class="cat-name">Vélo</span>
-        </div>
-        <div class="cat-card" data-cat="sommeil" style="--bg:#1a2030">
-          <span class="cat-emoji">😴</span><span class="cat-name">Sommeil</span>
-        </div>
-        <div class="cat-card" data-cat="journal" style="--bg:#2e2010">
-          <span class="cat-emoji">✍️</span><span class="cat-name">Journal</span>
-        </div>
-      </div>
-      <div class="dots-row">
-        <div class="dot"></div>
-        <div class="dot active"></div>
-        <div class="dot"></div>
       </div>
     </div>
-  </div>
+    <div class="hero-scroll-hint">
+      <span>Défiler</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
 
-  <!-- ═══════════════════════ SCREEN 3 — DASHBOARD ═══════════════════════ -->
-  <div class="screen" id="screen-home">
-    <nav class="sidebar">
-      <div class="sidebar-logo">
-        <div class="logo-mark">
-          <div class="logo-inner"></div>
-        </div>
-        <span class="sidebar-brand">Perfect day</span>
+  <!-- ══════════════ FEATURES ══════════════ -->
+  <section class="features" id="features">
+    <div class="container">
+      <div class="section-header" data-reveal>
+        <p class="section-tag">Fonctionnalités</p>
+        <h2 class="section-title">Tout ce dont vous<br>avez besoin</h2>
       </div>
-      <div class="nav-links">
-        <a class="nav-link active" data-tab="challenge">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          Challenge
-        </a>
-        <a class="nav-link" data-tab="goals">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-          Goals
-        </a>
-        <a class="nav-link" data-tab="tracking">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-          Tracking
-        </a>
-        <a class="nav-link" data-tab="profil">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          Profil
-        </a>
-      </div>
-      <div class="sidebar-profile">
-        <div class="avatar-sm"></div>
-        <div>
-          <div class="profile-name-sm">Lucas Rayers</div>
-          <div class="profile-role">Free plan</div>
+      <div class="features-grid">
+        <div class="feature-card" data-reveal data-delay="0">
+          <div class="fc-icon" style="background:#FED7AA">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#EA580C" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <h3 class="fc-title">Challenges du jour</h3>
+          <p class="fc-body">Un défi personnalisé chaque matin pour maintenir votre momentum et avancer vers vos objectifs.</p>
         </div>
-      </div>
-    </nav>
-
-    <main class="main-content">
-      <!-- TAB: CHALLENGE -->
-      <div class="tab-panel active" id="tab-challenge">
-        <div class="main-header">
-          <div>
-            <h2 class="main-title">Challenge of the day</h2>
-            <p class="main-sub">Lundi 11 novembre · Streak <span class="streak-badge">🔥 3</span></p>
+        <div class="feature-card" data-reveal data-delay="0.1">
+          <div class="fc-icon" style="background:#D4E6A5">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B6D11" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
           </div>
-          <div class="day-row">
-            <div class="day-chip active">L<span>11</span></div>
-            <div class="day-chip">M<span>11</span></div>
-            <div class="day-chip">M<span>11</span></div>
-            <div class="day-chip">J<span>11</span></div>
-            <div class="day-chip">V<span>11</span></div>
-            <div class="day-chip">S<span>11</span></div>
-            <div class="day-chip">D<span>11</span></div>
-          </div>
+          <h3 class="fc-title">Goals à long terme</h3>
+          <p class="fc-body">Définissez vos objectifs sur 365 jours et suivez votre progression jour après jour.</p>
         </div>
-
-        <div class="challenges-grid">
-          <div class="challenge-card green" id="c-meditation">
-            <div class="cc-accent"></div>
-            <div class="cc-icon">🧘</div>
-            <div class="cc-body">
-              <div class="cc-name">Méditation</div>
-              <div class="cc-freq">2 days / week</div>
-              <div class="cc-bar"><div class="cc-fill" style="width:0.5%"></div></div>
-              <div class="cc-count">2 / 365</div>
-            </div>
-            <button class="cc-btn arrow" onclick="openModal('meditation')">›</button>
+        <div class="feature-card" data-reveal data-delay="0.2">
+          <div class="fc-icon" style="background:#C5D8EC">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
           </div>
-          <div class="challenge-card red" id="c-sport">
-            <div class="cc-accent"></div>
-            <div class="cc-icon">🏋️</div>
-            <div class="cc-body">
-              <div class="cc-name">Sport</div>
-              <div class="cc-freq">every day</div>
-              <div class="cc-bar"><div class="cc-fill" style="width:30%"></div></div>
-              <div class="cc-count">0 / 365</div>
-            </div>
-            <button class="cc-btn check done" onclick="toggleDone(this)">✓</button>
-          </div>
-          <div class="challenge-card blue" id="c-lecture">
-            <div class="cc-accent"></div>
-            <div class="cc-icon">📚</div>
-            <div class="cc-body">
-              <div class="cc-name">Lecture</div>
-              <div class="cc-freq">5 days / week</div>
-              <div class="cc-bar"><div class="cc-fill" style="width:0%"></div></div>
-              <div class="cc-count">0 / 365</div>
-            </div>
-            <button class="cc-btn plus" onclick="increment(this)">+1</button>
-          </div>
+          <h3 class="fc-title">Tracking détaillé</h3>
+          <p class="fc-body">Visualisez vos streaks, votre taux de complétion et vos habitudes sur le long terme.</p>
         </div>
-      </div>
-
-      <!-- TAB: GOALS -->
-      <div class="tab-panel" id="tab-goals">
-        <div class="main-header">
-          <div>
-            <h2 class="main-title">Goals</h2>
-            <p class="main-sub">Tes objectifs à long terme</p>
+        <div class="feature-card" data-reveal data-delay="0.3">
+          <div class="fc-icon" style="background:#FEF08A">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#854F0B" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           </div>
-          <button class="btn-orange" onclick="openAddGoal()">+ Ajouter un goal</button>
+          <h3 class="fc-title">Communauté</h3>
+          <p class="fc-body">Rejoignez des milliers d'utilisateurs qui transforment leur quotidien chaque jour.</p>
         </div>
-        <div class="goals-list" id="goals-list">
-          <div class="goal-item red-goal">
-            <div class="goal-left-bar"></div>
-            <div class="goal-icon-wrap red-icon">🏃</div>
-            <div class="goal-info">
-              <div class="goal-name">Sport</div>
-              <div class="goal-prog-row">
-                <div class="goal-prog-bar"><div class="goal-prog-fill red-fill" style="width:0.3%"></div></div>
-                <span class="goal-prog-label">1 / 365</span>
-              </div>
-            </div>
-            <div class="goal-badge orange-badge">+1</div>
-          </div>
-          <div class="goal-item blue-goal">
-            <div class="goal-left-bar"></div>
-            <div class="goal-icon-wrap blue-icon">🧘</div>
-            <div class="goal-info">
-              <div class="goal-name">Méditation</div>
-              <div class="goal-prog-row">
-                <div class="goal-prog-bar"><div class="goal-prog-fill blue-fill" style="width:0.5%"></div></div>
-                <span class="goal-prog-label">2 / 365</span>
-              </div>
-            </div>
-            <div class="goal-badge blue-badge">+1</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB: TRACKING -->
-      <div class="tab-panel" id="tab-tracking">
-        <div class="main-header">
-          <h2 class="main-title">Tracking</h2>
-        </div>
-        <div class="tracking-grid">
-          <div class="stat-card">
-            <div class="stat-label">Streak actuel</div>
-            <div class="stat-value orange">🔥 3</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Challenges complétés</div>
-            <div class="stat-value">12</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Meilleur streak</div>
-            <div class="stat-value">7</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Taux de complétion</div>
-            <div class="stat-value green-v">68%</div>
-          </div>
-        </div>
-        <div class="heatmap-section">
-          <h3 class="section-title">Activité — novembre</h3>
-          <div class="heatmap" id="heatmap"></div>
-        </div>
-      </div>
-
-      <!-- TAB: PROFIL -->
-      <div class="tab-panel" id="tab-profil">
-        <div class="main-header">
-          <h2 class="main-title">Profil</h2>
-        </div>
-        <div class="profile-card">
-          <div class="profile-avatar-lg"></div>
-          <div class="profile-details">
-            <div class="profile-name-lg">Lucas Rayers</div>
-            <div class="profile-since">Membre depuis novembre 2024</div>
-          </div>
-        </div>
-        <div class="settings-list">
-          <div class="settings-item">Notifications <span class="toggle on"></span></div>
-          <div class="settings-item">Dark mode <span class="toggle"></span></div>
-          <div class="settings-item">Langue <span class="settings-val">Français</span></div>
-          <div class="settings-item danger">Se déconnecter</div>
-        </div>
-      </div>
-    </main>
-  </div>
-
-  <!-- ═══════════════════════ MODAL — CHALLENGE DETAIL ═══════════════════════ -->
-  <div class="modal-overlay hidden" id="modal-detail">
-    <div class="modal-sheet" id="modal-sheet">
-      <div class="modal-handle"></div>
-      <div class="modal-header-row">
-        <div class="modal-icon-wrap" id="modal-icon-wrap">🧘</div>
-        <div>
-          <div class="modal-title" id="modal-title">Méditation</div>
-          <div class="modal-freq" id="modal-freq">2 days / week</div>
-        </div>
-        <div class="modal-streak-badge" id="modal-streak">Streak 🔥 2</div>
-      </div>
-      <div class="modal-stats-row">
-        <div class="modal-stat"><div class="modal-stat-val" id="ms-done">2</div><div class="modal-stat-label">Faits</div></div>
-        <div class="modal-stat"><div class="modal-stat-val" id="ms-left">363</div><div class="modal-stat-label">Restants</div></div>
-        <div class="modal-stat"><div class="modal-stat-val orange" id="ms-pct">0.5%</div><div class="modal-stat-label">Complété</div></div>
-      </div>
-      <div class="modal-prog-bar"><div class="modal-prog-fill" id="modal-prog-fill" style="width:0.5%"></div></div>
-      <div class="modal-actions">
-        <button class="btn-ghost" onclick="closeModal()">Passer</button>
-        <button class="btn-orange-lg" id="modal-validate-btn" onclick="validateChallenge()">Valider aujourd'hui ✓</button>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- ═══════════════════════ MODAL — ADD GOAL ═══════════════════════ -->
-  <div class="modal-overlay hidden" id="modal-add-goal">
-    <div class="modal-sheet">
-      <div class="modal-handle"></div>
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
-        <div class="add-goal-icon-wrap">🎯</div>
-        <div class="modal-title">Ajouter un goal</div>
+  <!-- ══════════════ HOW IT WORKS ══════════════ -->
+  <section class="how" id="how">
+    <div class="container">
+      <div class="section-header" data-reveal>
+        <p class="section-tag">Comment ça marche</p>
+        <h2 class="section-title">Simple comme<br>bonjour</h2>
       </div>
-      <p class="modal-freq" style="margin-bottom:18px">Définis ton objectif et commence à tracker !</p>
-      <label class="field-label">Nom du goal</label>
-      <input class="field-input" type="text" placeholder="ex: Méditation quotidienne" id="goal-name-input" />
-      <label class="field-label">Fréquence</label>
-      <input class="field-input" type="text" placeholder="Tous les jours / 3x semaine..." id="goal-freq-input" />
-      <label class="field-label">Couleur</label>
-      <div class="color-chips" id="color-chips">
-        <div class="chip selected" style="background:#6B7F3E" data-color="#6B7F3E"></div>
-        <div class="chip" style="background:#8B2E2E" data-color="#8B2E2E"></div>
-        <div class="chip" style="background:#5B7A9C" data-color="#5B7A9C"></div>
-        <div class="chip" style="background:#F97316" data-color="#F97316"></div>
-        <div class="chip" style="background:#C17E7E" data-color="#C17E7E"></div>
-        <div class="chip" style="background:#7C5CBF" data-color="#7C5CBF"></div>
-      </div>
-      <div class="modal-actions" style="margin-top:20px">
-        <button class="btn-ghost" onclick="closeAddGoal()">Annuler</button>
-        <button class="btn-orange-lg" onclick="addGoal()">Créer le goal ✓</button>
+      <div class="steps">
+        <div class="step" data-reveal data-delay="0">
+          <div class="step-num">01</div>
+          <div class="step-content">
+            <h3 class="step-title">Choisissez vos challenges</h3>
+            <p class="step-body">Sélectionnez les domaines qui vous tiennent à cœur — Sport, Méditation, Business, Lecture et bien plus.</p>
+          </div>
+          <div class="step-visual sv1">
+            <div class="cat-mini-grid">
+              <div class="cmg-cell sel">🏋️<span>Sport</span></div>
+              <div class="cmg-cell">💼<span>Business</span></div>
+              <div class="cmg-cell sel">🧘<span>Méditation</span></div>
+              <div class="cmg-cell">📚<span>Lecture</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="step step-rev" data-reveal data-delay="0.1">
+          <div class="step-num">02</div>
+          <div class="step-content">
+            <h3 class="step-title">Validez chaque jour</h3>
+            <p class="step-body">Cochez vos challenges au quotidien. Construisez des streaks et restez dans le mouvement.</p>
+          </div>
+          <div class="step-visual sv2">
+            <div class="challenge-mini green-c">
+              <span class="cm-dot"></span>
+              <div class="cm-info"><span class="cm-name">Méditation</span><span class="cm-sub">2 / 365</span></div>
+              <div class="cm-check green-btn">›</div>
+            </div>
+            <div class="challenge-mini red-c">
+              <span class="cm-dot"></span>
+              <div class="cm-info"><span class="cm-name">Sport</span><span class="cm-sub">every day</span></div>
+              <div class="cm-check red-btn">✓</div>
+            </div>
+            <div class="challenge-mini blue-c">
+              <span class="cm-dot"></span>
+              <div class="cm-info"><span class="cm-name">Lecture</span><span class="cm-sub">0 / 365</span></div>
+              <div class="cm-check blue-btn">+1</div>
+            </div>
+          </div>
+        </div>
+        <div class="step" data-reveal data-delay="0.2">
+          <div class="step-num">03</div>
+          <div class="step-content">
+            <h3 class="step-title">Suivez vos progrès</h3>
+            <p class="step-body">Visualisez vos statistiques, vos streaks et l'évolution de vos objectifs semaine après semaine.</p>
+          </div>
+          <div class="step-visual sv3">
+            <div class="stats-mini">
+              <div class="sm-card"><div class="sm-val">🔥 7</div><div class="sm-lbl">Streak</div></div>
+              <div class="sm-card"><div class="sm-val" style="color:#6B7F3E">68%</div><div class="sm-lbl">Complété</div></div>
+              <div class="sm-card"><div class="sm-val">24</div><div class="sm-lbl">Jours actifs</div></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <script src="js/app.js"></script>
+  <!-- ══════════════ CATEGORIES ══════════════ -->
+  <section class="cats-section" id="cats">
+    <div class="container">
+      <div class="section-header" data-reveal>
+        <p class="section-tag">Catégories</p>
+        <h2 class="section-title">Tout ce que<br>vous voulez tracker</h2>
+      </div>
+      <div class="cats-scroll" data-reveal>
+        <div class="cat-pill">🏋️ Sport</div>
+        <div class="cat-pill">🧘 Méditation</div>
+        <div class="cat-pill">💼 Business</div>
+        <div class="cat-pill">📚 Lecture</div>
+        <div class="cat-pill">🚴 Vélo</div>
+        <div class="cat-pill">😴 Sommeil</div>
+        <div class="cat-pill">🏃 Running</div>
+        <div class="cat-pill">✍️ Journal</div>
+        <div class="cat-pill">🎯 Goals</div>
+        <div class="cat-pill">🍎 Nutrition</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ PRICING ══════════════ -->
+  <section class="pricing" id="pricing">
+    <div class="container">
+      <div class="section-header" data-reveal>
+        <p class="section-tag">Tarifs</p>
+        <h2 class="section-title">Simple &amp;<br>transparent</h2>
+      </div>
+      <div class="pricing-grid">
+        <div class="price-card" data-reveal data-delay="0">
+          <div class="pc-top">
+            <div class="pc-name">Free</div>
+            <div class="pc-price">0€<span>/mois</span></div>
+          </div>
+          <ul class="pc-list">
+            <li>3 challenges par jour</li>
+            <li>1 goal à long terme</li>
+            <li>Tracking basique</li>
+            <li class="off">Statistiques avancées</li>
+            <li class="off">Accès communauté</li>
+          </ul>
+          <a href="#start" class="btn-outline">Commencer gratuitement</a>
+        </div>
+        <div class="price-card featured" data-reveal data-delay="0.12">
+          <div class="pc-badge">Populaire</div>
+          <div class="pc-top">
+            <div class="pc-name">Pro</div>
+            <div class="pc-price">9€<span>/mois</span></div>
+          </div>
+          <ul class="pc-list">
+            <li>Challenges illimités</li>
+            <li>Goals illimités</li>
+            <li>Tracking complet</li>
+            <li>Statistiques avancées</li>
+            <li>Accès communauté</li>
+          </ul>
+          <a href="#start" class="btn-dark">On commence !</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ CTA FINAL ══════════════ -->
+  <section class="cta-section" id="start">
+    <div class="container">
+      <div class="cta-inner" data-reveal>
+        <div class="cta-sun">
+          <div class="cta-sun-outer">
+            <div class="cta-sun-inner">
+              <div class="cta-sun-dot"></div>
+            </div>
+          </div>
+        </div>
+        <h2 class="cta-title">Votre perfect day<br>commence maintenant</h2>
+        <p class="cta-body">Rejoignez des milliers de personnes qui transforment leur quotidien.</p>
+        <a href="#" class="btn-dark btn-lg">On commence !</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ FOOTER ══════════════ -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-logo">
+        <div class="nav-sun" style="width:28px;height:28px;border-radius:8px">
+          <div class="nav-sun-inner" style="width:18px;height:18px;border-radius:5px">
+            <div class="nav-sun-dot" style="width:6px;height:6px;border-radius:2px"></div>
+          </div>
+        </div>
+        <span>Perfect day</span>
+      </div>
+      <div class="footer-links">
+        <a href="#">Confidentialité</a>
+        <a href="#">CGU</a>
+        <a href="#">Contact</a>
+      </div>
+      <p class="footer-copy">© 2025 Perfect Day. Tous droits réservés.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>
