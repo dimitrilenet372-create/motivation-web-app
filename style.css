@@ -98,19 +98,27 @@ img { display: block; max-width: 100%; }
 .nav-sun {
   width: 34px; height: 34px;
   background: var(--orange);
-  border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
+  border-radius: 28%;
+  display: flex; align-items: flex-start; justify-content: flex-start;
+  padding: 3px;
+  box-sizing: border-box;
+  position: relative;
 }
 .nav-sun-inner {
   width: 22px; height: 22px;
   background: var(--yellow);
-  border-radius: 6px;
-  display: flex; align-items: center; justify-content: center;
+  border-radius: 28%;
+  position: relative;
+  flex-shrink: 0;
+  overflow: hidden;
 }
 .nav-sun-dot {
   width: 7px; height: 7px;
   background: var(--cream);
-  border-radius: 2px;
+  border-radius: 28%;
+  position: absolute;
+  top: 0; left: 0;
+  pointer-events: none;
 }
 
 .nav-links {
