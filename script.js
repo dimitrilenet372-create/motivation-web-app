@@ -2,12 +2,11 @@
    PERFECT DAY — SITE JS
 ═══════════════════════════════════════════ */
 
-/* ─── DOT FOLLOWS MOUSE ─── */
+/* ─── SUN DOT FOLLOWS MOUSE ─── */
 (function () {
-  const dot = document.querySelector('.nav-sun-dot');
-  const inner = document.querySelector('.nav-sun-inner');
+  const dot   = document.querySelector('.sun-dot');
+  const inner = document.querySelector('.sun-inner');
   if (!dot || !inner) return;
-  const DOT = 7;
   let mouseX = 0, mouseY = 0;
 
   document.addEventListener('mousemove', (e) => {
@@ -16,9 +15,11 @@
   });
 
   function tick() {
-    const rect = inner.getBoundingClientRect();
-    const x = Math.min(Math.max(mouseX - rect.left - DOT / 2, 0), rect.width - DOT);
-    const y = Math.min(Math.max(mouseY - rect.top  - DOT / 2, 0), rect.height - DOT);
+    const rect   = inner.getBoundingClientRect();
+    const dotW   = dot.offsetWidth  || rect.width  * 0.22;
+    const dotH   = dot.offsetHeight || rect.height * 0.22;
+    const x = Math.min(Math.max(mouseX - rect.left - dotW / 2, 0), rect.width  - dotW);
+    const y = Math.min(Math.max(mouseY - rect.top  - dotH / 2, 0), rect.height - dotH);
     dot.style.left = x + 'px';
     dot.style.top  = y + 'px';
     requestAnimationFrame(tick);
