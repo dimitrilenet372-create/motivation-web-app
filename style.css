@@ -109,7 +109,7 @@ img { display: block; max-width: 100%; }
   background: var(--yellow);
   border-radius: 28%;
   display: flex; align-items: flex-start; justify-content: flex-end;
-  padding: 2px;
+  padding: 3px;
   box-sizing: border-box;
   flex-shrink: 0;
 }
@@ -320,7 +320,7 @@ img { display: block; max-width: 100%; }
   background: var(--yellow);
   border-radius: clamp(18px, 3.5vw, 40px);
   display: flex; align-items: flex-start; justify-content: flex-end;
-  padding: 5%;
+  padding: clamp(6px, 1.5vw, 16px);
   box-sizing: border-box;
 }
 
@@ -718,7 +718,7 @@ section { padding: clamp(64px, 10vh, 120px) 0; }
   background: var(--yellow);
   border-radius: 13px;
   display: flex; align-items: flex-start; justify-content: flex-end;
-  padding: 4px;
+  padding: 6px;
   box-sizing: border-box;
 }
 .cta-sun-dot {
