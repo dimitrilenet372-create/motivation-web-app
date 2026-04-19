@@ -99,9 +99,7 @@ img { display: block; max-width: 100%; }
   width: 34px; height: 34px;
   background: var(--orange);
   border-radius: 28%;
-  display: flex; align-items: flex-start; justify-content: flex-start;
-  padding: 3px;
-  box-sizing: border-box;
+  display: flex; align-items: center; justify-content: center;
   position: relative;
 }
 .nav-sun-inner {
@@ -299,10 +297,8 @@ img { display: block; max-width: 100%; }
   background: var(--orange);
   border-radius: clamp(40px, 6vw, 72px);
   display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
-  padding: 5px;
-  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
   transition: transform 0.35s cubic-bezier(.34,1.56,.64,1);
   will-change: transform;
   animation: sun-float 5s ease-in-out infinite;
