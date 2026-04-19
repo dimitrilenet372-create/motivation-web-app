@@ -295,7 +295,7 @@ img { display: block; max-width: 100%; }
   width: clamp(200px, 28vw, 340px);
   height: clamp(200px, 28vw, 340px);
   background: var(--orange);
-  border-radius: clamp(40px, 6vw, 72px);
+  border-radius: 28%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -314,7 +314,7 @@ img { display: block; max-width: 100%; }
   width: 63%;
   height: 63%;
   background: var(--yellow);
-  border-radius: clamp(18px, 3.5vw, 40px);
+  border-radius: 28%;
   display: flex; align-items: flex-start; justify-content: flex-end;
   padding: clamp(6px, 1.5vw, 16px);
   box-sizing: border-box;
@@ -324,7 +324,7 @@ img { display: block; max-width: 100%; }
   width: 22%;
   height: 22%;
   background: var(--cream);
-  border-radius: 6px;
+  border-radius: 28%;
 }
 
 .hero-scroll-hint {
@@ -705,14 +705,14 @@ section { padding: clamp(64px, 10vh, 120px) 0; }
 .cta-sun-outer {
   width: 80px; height: 80px;
   background: var(--orange);
-  border-radius: 20px;
+  border-radius: 28%;
   display: flex; align-items: center; justify-content: center;
   animation: sun-float 5s ease-in-out infinite;
 }
 .cta-sun-inner {
   width: 52px; height: 52px;
   background: var(--yellow);
-  border-radius: 13px;
+  border-radius: 28%;
   display: flex; align-items: flex-start; justify-content: flex-end;
   padding: 6px;
   box-sizing: border-box;
@@ -720,7 +720,7 @@ section { padding: clamp(64px, 10vh, 120px) 0; }
 .cta-sun-dot {
   width: 14px; height: 14px;
   background: var(--cream);
-  border-radius: 4px;
+  border-radius: 28%;
   flex-shrink: 0;
 }
 
