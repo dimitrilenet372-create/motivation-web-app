@@ -414,20 +414,16 @@ body {
 .goal-action:hover { opacity: 0.8; transform: scale(1.1); }
 .goal-pause-btn {
   width: 26px; height: 26px; border-radius: 50%;
-  border: none; background: #FEF08A; color: #854F0B;
+  border: none; background: #CA8A04; color: white;
   font-size: 10px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  transition: all 0.15s;
 }
-.goal-pause-btn:hover { background: #CA8A04; color: white; transform: scale(1.1); }
 .goal-delete-btn {
   width: 26px; height: 26px; border-radius: 50%;
-  border: none; background: #FFE4E4; color: #DC2626;
+  border: none; background: #DC2626; color: white;
   font-size: 10px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  transition: all 0.15s;
 }
-.goal-delete-btn:hover { background: #DC2626; color: white; transform: scale(1.1); }
 .goal-card.paused .goal-name,
 .goal-card.paused .goal-prog { color: #9CA3AF; }
 
