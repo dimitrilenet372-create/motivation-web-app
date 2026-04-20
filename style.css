@@ -280,7 +280,7 @@ img { display: block; max-width: 100%; }
 }
 .btn-outline:hover { background: var(--dark); color: var(--white); }
 
-/* ─── SUN ─── */
+/* ─── SUN · orange > jaune(69%) > blanc(14%) · gap 10% ─── */
 .hero-visual {
   display: flex;
   align-items: center;
