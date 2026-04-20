@@ -7,8 +7,8 @@ const CATEGORIES = [
   { id: 'business',   name: 'Business',   emoji: '💼', color: 'yellow' },
   { id: 'meditation', name: 'Méditation', emoji: '🧘', color: 'green'  },
   { id: 'goals',      name: 'Goals',      emoji: '🎯', color: 'red'    },
-  { id: 'reading',    name: 'Lecture',    emoji: '📚', color: 'blue'   },
-  { id: 'health',     name: 'Santé',      emoji: '💪', color: 'green'  },
+  { id: 'reading',    name: 'Lecture',    emoji: '📚', color: 'purple' },
+  { id: 'health',     name: 'Santé',      emoji: '💪', color: 'pink'   },
   { id: 'finance',    name: 'Finance',    emoji: '💰', color: 'yellow' },
   { id: 'growth',     name: 'Growth',     emoji: '🌱', color: 'green'  },
   { id: 'sleep',      name: 'Sommeil',    emoji: '😴', color: 'blue'   },
@@ -191,22 +191,32 @@ function renderTracking() {
     return;
   }
   el.innerHTML = state.challenges.map(c => {
-    const pct    = Math.min(100, (c.progress / c.target) * 100);
+    const pct    = Math.min(100, (c.progress / c.target) * 100).toFixed(1);
     const streak = getStreak(c);
     return `
       <div class="tracking-card">
         <div class="tracking-header">
           <span class="tracking-emoji">${c.emoji}</span>
           <span class="tracking-name">${c.name}</span>
+          <span class="tracking-pct">${pct}%</span>
         </div>
         <div class="tracking-body">
           <div class="progress-bar-big">
             <div class="progress-bar-fill" style="width:${pct}%"></div>
           </div>
           <div class="tracking-stats">
-            <div class="tracking-stat"><span>${c.progress}</span>jours</div>
-            <div class="tracking-stat"><span>${c.target - c.progress}</span>restants</div>
-            <div class="tracking-stat"><span>${streak}</span>streak 🔥</div>
+            <div class="tracking-stat">
+              <span class="tracking-stat-num">${c.progress}</span>
+              <span class="tracking-stat-label">jours</span>
+            </div>
+            <div class="tracking-stat">
+              <span class="tracking-stat-num">${c.target - c.progress}</span>
+              <span class="tracking-stat-label">restants</span>
+            </div>
+            <div class="tracking-stat">
+              <span class="tracking-stat-num">${streak} 🔥</span>
+              <span class="tracking-stat-label">streak</span>
+            </div>
           </div>
         </div>
       </div>`;
