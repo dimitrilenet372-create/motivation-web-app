@@ -229,7 +229,7 @@ img { display: block; max-width: 100%; }
   font-family: var(--font-serif);
   font-size: clamp(52px, 7vw, 96px);
   font-weight: 700;
-  line-height: 1.0;
+  line-height: 0.85;
   letter-spacing: -0.03em;
   color: var(--dark);
   margin-bottom: 28px;
