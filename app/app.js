@@ -113,27 +113,51 @@ function renderGoalsList() {
   el.querySelectorAll('.goal-action').forEach(btn => {
     btn.addEventListener('click', () => {
       const g = state.goals.find(x => x.id === btn.dataset.id);
-      if (g && g.progress < g.target) {
+      if (g && !g.paused && g.progress < g.target) {
         g.progress++;
         save();
-        renderHome();
+        renderGoalsList();
       }
+    });
+  });
+  el.querySelectorAll('.goal-pause-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const g = state.goals.find(x => x.id === btn.dataset.id);
+      if (g) { g.paused = !g.paused; save(); renderGoalsList(); }
+    });
+  });
+  el.querySelectorAll('.goal-delete-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (!confirm('Supprimer ce goal ?')) return;
+      state.goals = state.goals.filter(x => x.id !== btn.dataset.id);
+      save();
+      renderGoalsList();
     });
   });
 }
 
 function goalCardHTML(g) {
   const pct = Math.min(100, (g.progress / g.target) * 100).toFixed(1);
-  const col = GOAL_COLORS[g.colorIndex ?? 0];
+  const col = g.paused ? null : GOAL_COLORS[g.colorIndex ?? 0];
+  const cardStyle = g.paused
+    ? 'border-left:4px solid #CA8A04;background:#FFFBEB;opacity:0.7'
+    : `border-left:4px solid ${col.border};background:${col.bg}`;
+  const fillStyle = g.paused ? 'background:#CA8A04' : `background:${col.border}`;
   return `
-    <div class="goal-card" style="border-left:4px solid ${col.border};background:${col.bg}">
+    <div class="goal-card ${g.paused ? 'paused' : ''}" style="${cardStyle}">
       <span class="goal-emoji">${g.emoji}</span>
       <div class="goal-info">
         <div class="goal-name">${g.name}</div>
-        <div class="goal-prog">${g.progress}/${g.target}</div>
-        <div class="goal-prog-bar"><div class="goal-prog-fill" style="width:${pct}%;background:${col.border}"></div></div>
+        <div class="goal-prog">${g.progress}/${g.target}${g.paused ? ' · En pause' : ''}</div>
+        <div class="goal-prog-bar"><div class="goal-prog-fill" style="width:${pct}%;${fillStyle}"></div></div>
       </div>
-      <button class="goal-action" data-id="${g.id}" style="background:${col.border}">+1</button>
+      <div class="goal-actions-wrap">
+        ${!g.paused ? `<button class="goal-action" data-id="${g.id}" style="background:${col.border}">+1</button>` : ''}
+        <button class="goal-pause-btn" data-id="${g.id}" title="${g.paused ? 'Reprendre' : 'Pause'}">
+          ${g.paused ? '▶' : '⏸'}
+        </button>
+        <button class="goal-delete-btn" data-id="${g.id}" title="Supprimer">✕</button>
+      </div>
     </div>`;
 }
 

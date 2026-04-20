@@ -399,16 +399,37 @@ body {
   height: 100%; background: var(--orange); border-radius: 3px;
   transition: width 0.4s ease;
 }
+.goal-actions-wrap {
+  display: flex; flex-direction: column; align-items: center; gap: 5px; flex-shrink: 0;
+}
 .goal-action {
   width: 34px; height: 34px; border-radius: 50%;
-  border: 2.5px solid var(--orange);
-  background: transparent; color: var(--orange);
-  font-size: 15px; font-weight: 800;
+  border: none;
+  color: white;
+  font-size: 13px; font-weight: 800;
   cursor: pointer; display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
   transition: all 0.15s;
 }
-.goal-action:hover { opacity: 0.85; color: white; transform: scale(1.1); }
+.goal-action:hover { opacity: 0.8; transform: scale(1.1); }
+.goal-pause-btn {
+  width: 26px; height: 26px; border-radius: 50%;
+  border: none; background: #FEF08A; color: #854F0B;
+  font-size: 10px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.goal-pause-btn:hover { background: #CA8A04; color: white; transform: scale(1.1); }
+.goal-delete-btn {
+  width: 26px; height: 26px; border-radius: 50%;
+  border: none; background: #FFE4E4; color: #DC2626;
+  font-size: 10px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.goal-delete-btn:hover { background: #DC2626; color: white; transform: scale(1.1); }
+.goal-card.paused .goal-name,
+.goal-card.paused .goal-prog { color: #9CA3AF; }
 
 .btn-add-first-goal {
   width: 100%; padding: 16px;
