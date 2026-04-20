@@ -216,23 +216,23 @@ img { display: block; max-width: 100%; }
 
 .hero-inner {
   width: 100%;
-  max-width: var(--max);
+  max-width: 480px;
   margin: 0 auto;
   padding: clamp(40px, 6vh, 80px) var(--gutter);
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 60px;
-  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 28px;
 }
 
 .hero-title {
   font-family: var(--font-serif);
-  font-size: clamp(52px, 7vw, 96px);
+  font-size: clamp(48px, 10vw, 88px);
   font-weight: 700;
-  line-height: 0.85;
+  line-height: 1;
   letter-spacing: -0.03em;
   color: var(--dark);
-  margin-bottom: 28px;
 }
 .hero-title em {
   font-style: italic;
@@ -243,8 +243,7 @@ img { display: block; max-width: 100%; }
   font-size: clamp(15px, 1.5vw, 17px);
   color: var(--gray);
   line-height: 1.75;
-  max-width: 420px;
-  margin-bottom: 40px;
+  max-width: 360px;
 }
 
 /* ─── BUTTONS ─── */
@@ -297,8 +296,10 @@ img { display: block; max-width: 100%; }
   background: var(--orange);
   border-radius: 28%;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 8%;
+  box-sizing: border-box;
   transition: transform 0.35s cubic-bezier(.34,1.56,.64,1);
   will-change: transform;
   animation: sun-float 5s ease-in-out infinite;
@@ -801,13 +802,6 @@ section { padding: clamp(64px, 10vh, 120px) 0; }
   .nav-links, .btn-nav { display: none; }
   .burger { display: flex; }
 
-  .hero-inner {
-    grid-template-columns: 1fr;
-    text-align: center;
-    gap: 40px;
-  }
-  .hero-text { order: 1; display: flex; flex-direction: column; align-items: center; }
-  .hero-visual { order: 0; }
   .hero-scroll-hint { display: none; }
 
   .step {
