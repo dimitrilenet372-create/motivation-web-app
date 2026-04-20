@@ -16,6 +16,16 @@ const CATEGORIES = [
 
 const DAYS_FR = ['D','L','M','M','J','V','S'];
 
+const GOAL_COLORS = [
+  { border: '#F97316', bg: '#FFF7ED' }, // orange
+  { border: '#2563EB', bg: '#BFDBFE' }, // blue
+  { border: '#16A34A', bg: '#BBFFD5' }, // green
+  { border: '#7C3AED', bg: '#E9D5FF' }, // purple
+  { border: '#DB2777', bg: '#FCE7F3' }, // pink
+  { border: '#CA8A04', bg: '#FEF08A' }, // yellow
+  { border: '#DC2626', bg: '#FFC9C9' }, // red
+];
+
 let state = {
   user: { name: '', onboarded: false },
   challenges: [],
@@ -95,7 +105,8 @@ function renderHome() {
 function renderGoalsList() {
   const el = document.getElementById('goals-list');
   if (!state.goals.length) {
-    el.innerHTML = '<div class="empty-state">Aucun goal — clique sur + pour en ajouter un</div>';
+    el.innerHTML = '<button class="btn-add-first-goal" id="add-first-goal">Add your first goal</button>';
+    document.getElementById('add-first-goal').addEventListener('click', openGoalModal);
     return;
   }
   el.innerHTML = state.goals.map(g => goalCardHTML(g)).join('');
@@ -113,15 +124,16 @@ function renderGoalsList() {
 
 function goalCardHTML(g) {
   const pct = Math.min(100, (g.progress / g.target) * 100).toFixed(1);
+  const col = GOAL_COLORS[g.colorIndex ?? 0];
   return `
-    <div class="goal-card">
+    <div class="goal-card" style="border-left:4px solid ${col.border};background:${col.bg}">
       <span class="goal-emoji">${g.emoji}</span>
       <div class="goal-info">
         <div class="goal-name">${g.name}</div>
         <div class="goal-prog">${g.progress}/${g.target}</div>
-        <div class="goal-prog-bar"><div class="goal-prog-fill" style="width:${pct}%"></div></div>
+        <div class="goal-prog-bar"><div class="goal-prog-fill" style="width:${pct}%;background:${col.border}"></div></div>
       </div>
-      <button class="goal-action" data-id="${g.id}">+1</button>
+      <button class="goal-action" data-id="${g.id}" style="background:${col.border}">+1</button>
     </div>`;
 }
 
@@ -353,6 +365,7 @@ document.getElementById('save-goal').addEventListener('click', () => {
     id: uid(),
     name,
     emoji: goalSelectedCat ? goalSelectedCat.emoji : '🎯',
+    colorIndex: state.goals.length % GOAL_COLORS.length,
     progress: 0,
     target: goalTarget,
   });

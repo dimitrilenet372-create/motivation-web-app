@@ -383,7 +383,7 @@ body {
   padding: 14px 16px;
   border-radius: 16px; margin-bottom: 10px;
   background: white;
-  border: 2px solid var(--border);
+  border: none;
   border-left: 5px solid var(--orange);
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
@@ -408,7 +408,17 @@ body {
   flex-shrink: 0;
   transition: all 0.15s;
 }
-.goal-action:hover { background: var(--orange); color: white; transform: scale(1.1); }
+.goal-action:hover { opacity: 0.85; color: white; transform: scale(1.1); }
+
+.btn-add-first-goal {
+  width: 100%; padding: 16px;
+  background: var(--dark); color: white;
+  border: none; border-radius: 14px;
+  font-family: var(--font-sans); font-size: 16px; font-weight: 600;
+  cursor: pointer; letter-spacing: 0.01em;
+  transition: background 0.15s, transform 0.1s;
+}
+.btn-add-first-goal:hover { background: var(--dark2); transform: scale(0.99); }
 
 .empty-state {
   text-align: center; padding: 28px 20px;
