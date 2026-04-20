@@ -46,24 +46,34 @@ const sunOuter = document.getElementById('sun-outer');
 const sunWrap  = document.getElementById('sun-wrap');
 
 if (sunWrap && sunOuter) {
-  sunWrap.addEventListener('mousemove', (e) => {
+  const PROXIMITY = 320;
+  let mouseX = 0, mouseY = 0;
+
+  document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  }, { passive: true });
+
+  (function proximityTick() {
     const rect = sunWrap.getBoundingClientRect();
     const cx = rect.left + rect.width  / 2;
     const cy = rect.top  + rect.height / 2;
-    const dx = (e.clientX - cx) / (rect.width  / 2);
-    const dy = (e.clientY - cy) / (rect.height / 2);
-    sunOuter.style.transform = `
-      translate(${dx * 8}px, ${dy * 8}px)
-      rotate(${dx * 3}deg)
-      scale(1.03)
-    `;
-    sunOuter.style.animationPlayState = 'paused';
-  });
+    const dx = mouseX - cx;
+    const dy = mouseY - cy;
+    const dist = Math.sqrt(dx * dx + dy * dy);
 
-  sunWrap.addEventListener('mouseleave', () => {
-    sunOuter.style.transform = '';
-    sunOuter.style.animationPlayState = 'running';
-  });
+    if (dist < PROXIMITY) {
+      const strength = (1 - dist / PROXIMITY);
+      const tx = (dx / dist || 0) * strength * 18;
+      const ty = (dy / dist || 0) * strength * 18;
+      sunOuter.style.transform = `translate(${tx}px, ${ty}px) scale(${1 + strength * 0.04})`;
+      sunOuter.style.animationPlayState = 'paused';
+    } else {
+      sunOuter.style.transform = '';
+      sunOuter.style.animationPlayState = 'running';
+    }
+    requestAnimationFrame(proximityTick);
+  }());
 
   sunWrap.addEventListener('click', () => {
     sunOuter.style.transition = 'transform 0.15s';
