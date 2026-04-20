@@ -297,8 +297,10 @@ img { display: block; max-width: 100%; }
   background: var(--orange);
   border-radius: 28%;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 10%;
+  box-sizing: border-box;
   transition: transform 0.35s cubic-bezier(.34,1.56,.64,1);
   will-change: transform;
   animation: sun-float 5s ease-in-out infinite;
