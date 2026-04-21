@@ -336,15 +336,38 @@ body {
 /* ══════════════════════════════════════════
    CHALLENGE CARDS — flashy colors
 ══════════════════════════════════════════ */
+.challenge-row {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.challenge-swipe-del {
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 80px; display: flex;
+}
+.ch-del-btn {
+  flex: 1; border: none; cursor: pointer;
+  background: var(--c-red); color: white;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 3px;
+  font-family: var(--font-sans); font-size: 11px; font-weight: 700;
+  transition: filter 0.15s;
+}
+.ch-del-btn:hover { filter: brightness(0.9); }
+.ch-del-icon { font-size: 18px; line-height: 1; }
+
 .challenge-card {
   display: flex; align-items: center; gap: 12px;
   padding: 14px 16px;
   border-radius: 16px;
-  margin-bottom: 10px;
-  transition: transform 0.12s, box-shadow 0.12s;
+  margin-bottom: 0;
+  transition: transform 0.28s var(--ease-out), box-shadow 0.12s;
   cursor: default;
   position: relative;
   overflow: hidden;
+  will-change: transform;
 }
 .challenge-card:active { transform: scale(0.98); }
 
@@ -477,6 +500,30 @@ body {
 
 .goal-row.is-paused .goal-swipe-actions { display: none; }
 .goal-row.is-paused .goal-card { cursor: pointer; }
+
+/* Completed goal */
+.goal-row.is-complete .goal-swipe-actions { display: none; }
+.goal-row.is-complete .goal-card {
+  border-left-color: var(--c-green) !important;
+  background: var(--c-green-bg) !important;
+  cursor: default;
+}
+.goal-complete-badge {
+  font-size: 20px; flex-shrink: 0;
+}
+
+/* Toast */
+.toast {
+  position: absolute;
+  bottom: 90px; left: 50%;
+  transform: translateX(-50%) translateY(12px);
+  background: var(--dark); color: white;
+  padding: 11px 22px; border-radius: 50px;
+  font-size: 14px; font-weight: 600;
+  opacity: 0; transition: opacity 0.22s, transform 0.22s;
+  z-index: 200; white-space: nowrap; pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 
 .btn-add-first-goal {

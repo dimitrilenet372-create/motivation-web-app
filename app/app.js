@@ -117,6 +117,7 @@ function renderGoalsList() {
         g.progress++;
         save();
         renderGoalsList();
+        if (g.progress >= g.target) showToast(`🏆 ${g.name} — objectif atteint !`);
       }
     });
   });
@@ -139,13 +140,17 @@ function renderGoalsList() {
 
 function goalCardHTML(g) {
   const pct = Math.min(100, (g.progress / g.target) * 100).toFixed(1);
-  const col = g.paused ? null : GOAL_COLORS[g.colorIndex ?? 0];
-  const cardStyle = g.paused
-    ? 'border-left:5px solid var(--c-yellow);background:#FFFBEB;opacity:0.75'
-    : `border-left:5px solid ${col.border};background:${col.bg}`;
-  const fillStyle = g.paused ? 'background:var(--c-yellow)' : `background:${col.border}`;
+  const complete = g.progress >= g.target;
+  const col = (g.paused || complete) ? null : GOAL_COLORS[g.colorIndex ?? 0];
+  const cardStyle = complete
+    ? ''
+    : g.paused
+      ? 'border-left:5px solid var(--c-yellow);background:#FFFBEB;opacity:0.75'
+      : `border-left:5px solid ${col.border};background:${col.bg}`;
+  const fillStyle = g.paused ? 'background:var(--c-yellow)' : complete ? '' : `background:${col.border}`;
+  const rowClass = complete ? 'is-complete' : g.paused ? 'is-paused' : '';
   return `
-    <div class="goal-row ${g.paused ? 'is-paused' : ''}" data-id="${g.id}">
+    <div class="goal-row ${rowClass}" data-id="${g.id}">
       <div class="goal-swipe-actions">
         <button class="goal-swipe-pause" data-id="${g.id}">
           <span class="goal-swipe-icon">${g.paused ? '▶' : '⏸'}</span>
@@ -159,11 +164,12 @@ function goalCardHTML(g) {
       <div class="goal-card ${g.paused ? 'paused' : ''}" style="${cardStyle}">
         <span class="goal-emoji">${g.emoji}</span>
         <div class="goal-info">
-          <div class="goal-name">${g.name}</div>
-          <div class="goal-prog">${g.progress}/${g.target}${g.paused ? ' · En pause' : ''}</div>
+          <div class="goal-name">${g.name}${complete ? ' ✓' : ''}</div>
+          <div class="goal-prog">${complete ? 'Objectif atteint 🎉' : `${g.progress}/${g.target}${g.paused ? ' · En pause' : ''}`}</div>
           <div class="goal-prog-bar"><div class="goal-prog-fill" style="width:${pct}%;${fillStyle}"></div></div>
         </div>
-        ${!g.paused ? `<button class="goal-action" data-id="${g.id}" style="background:${col.border}">+1</button>` : ''}
+        ${(!g.paused && !complete) ? `<button class="goal-action" data-id="${g.id}" style="background:${col.border}">+1</button>` : ''}
+        ${complete ? `<span class="goal-complete-badge">🏆</span>` : ''}
       </div>
     </div>`;
 }
@@ -184,15 +190,22 @@ function challengeCardHTML(c) {
   const pct  = Math.min(100, (c.progress / c.target) * 100).toFixed(1);
   const colorClass = done ? 'done-today' : 'color-' + c.color;
   return `
-    <div class="challenge-card ${colorClass}" style="--fill:${pct}%">
-      <div class="ch-avatar">${c.emoji}</div>
-      <div class="ch-info">
-        <div class="ch-name">${c.name}</div>
-        <div class="ch-prog">${c.progress}/${c.target}</div>
+    <div class="challenge-row" data-id="${c.id}">
+      <div class="challenge-swipe-del">
+        <button class="ch-del-btn" data-id="${c.id}">
+          <span class="ch-del-icon">✕</span>Supp.
+        </button>
       </div>
-      <button class="ch-action ${done ? 'done' : ''}" data-id="${c.id}">
-        ${done ? '✓' : '+1'}
-      </button>
+      <div class="challenge-card ${colorClass}" style="--fill:${pct}%">
+        <div class="ch-avatar">${c.emoji}</div>
+        <div class="ch-info">
+          <div class="ch-name">${c.name}</div>
+          <div class="ch-prog">${c.progress}/${c.target}</div>
+        </div>
+        <button class="ch-action ${done ? 'done' : ''}" data-id="${c.id}">
+          ${done ? '✓' : '+1'}
+        </button>
+      </div>
     </div>`;
 }
 
@@ -200,16 +213,23 @@ function bindChallengeActions(container) {
   container.querySelectorAll('.ch-action').forEach(btn => {
     btn.addEventListener('click', () => {
       const c = state.challenges.find(x => x.id === btn.dataset.id);
-      if (!c) return;
-      if (!isDoneToday(c)) {
-        if (!c.completions) c.completions = [];
-        c.completions.push(today());
-        c.progress = Math.min(c.progress + 1, c.target);
-        save();
-        renderCurrentTab(document.querySelector('.tab.active').id);
-      }
+      if (!c || isDoneToday(c)) return;
+      if (!c.completions) c.completions = [];
+      c.completions.push(today());
+      c.progress = Math.min(c.progress + 1, c.target);
+      save();
+      renderCurrentTab(document.querySelector('.tab.active').id);
     });
   });
+  container.querySelectorAll('.ch-del-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (!confirm('Supprimer ce challenge ?')) return;
+      state.challenges = state.challenges.filter(x => x.id !== btn.dataset.id);
+      save();
+      renderCurrentTab(document.querySelector('.tab.active').id);
+    });
+  });
+  initChallengeSwipe(container);
 }
 
 /* ── ALL CHALLENGES ── */
@@ -332,6 +352,20 @@ function buildCatGrid(containerId, onSelect) {
   });
 }
 
+/* ── TOAST ── */
+function showToast(msg) {
+  const app = document.getElementById('app');
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  app.appendChild(t);
+  requestAnimationFrame(() => { requestAnimationFrame(() => t.classList.add('show')); });
+  setTimeout(() => {
+    t.classList.remove('show');
+    setTimeout(() => t.remove(), 300);
+  }, 2800);
+}
+
 /* ── GOAL SWIPE ── */
 const SWIPE_W = 130;
 
@@ -412,12 +446,75 @@ function closeAllGoalSwipes() {
   document.querySelectorAll('.goal-row').forEach(r => { if (r._swiped) closeGoalSwipe(r); });
 }
 
+/* ── CHALLENGE SWIPE ── */
+const CH_SWIPE_W = 80;
+
+function initChallengeSwipe(container) {
+  container.querySelectorAll('.challenge-row').forEach(row => {
+    const card = row.querySelector('.challenge-card');
+    let startX = 0, startY = 0, tracking = false;
+
+    card.addEventListener('touchstart', e => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      tracking = true;
+      row._wasTouched = true;
+      card.style.transition = 'none';
+    }, { passive: true });
+
+    card.addEventListener('touchmove', e => {
+      if (!tracking) return;
+      const dx = e.touches[0].clientX - startX;
+      const dy = e.touches[0].clientY - startY;
+      if (!row._swiped && Math.abs(dy) > Math.abs(dx) + 4) { tracking = false; return; }
+      const base = row._swiped ? -CH_SWIPE_W : 0;
+      card.style.transform = `translateX(${Math.max(-CH_SWIPE_W, Math.min(0, base + dx))}px)`;
+    }, { passive: true });
+
+    card.addEventListener('touchend', e => {
+      if (!tracking) return;
+      tracking = false;
+      card.style.transition = `transform 0.28s var(--ease-out)`;
+      const dx = e.changedTouches[0].clientX - startX;
+      const base = row._swiped ? -CH_SWIPE_W : 0;
+      base + dx < -CH_SWIPE_W / 3 ? openChallengeSwipe(row) : closeChallengeSwipe(row);
+    });
+
+    card.addEventListener('click', e => {
+      if (row._wasTouched) { row._wasTouched = false; return; }
+      if (e.target.closest('.ch-action')) return;
+      row._swiped ? closeChallengeSwipe(row) : openChallengeSwipe(row);
+    });
+  });
+}
+
+function openChallengeSwipe(row) {
+  closeAllChallengeSwipes();
+  const card = row.querySelector('.challenge-card');
+  card.style.transition = `transform 0.28s var(--ease-out)`;
+  card.style.transform = `translateX(-${CH_SWIPE_W}px)`;
+  row._swiped = true;
+}
+
+function closeChallengeSwipe(row) {
+  const card = row.querySelector('.challenge-card');
+  card.style.transition = `transform 0.28s var(--ease-out)`;
+  card.style.transform = 'translateX(0)';
+  row._swiped = false;
+}
+
+function closeAllChallengeSwipes() {
+  document.querySelectorAll('.challenge-row').forEach(r => { if (r._swiped) closeChallengeSwipe(r); });
+}
+
 document.addEventListener('touchstart', e => {
   if (!e.target.closest('.goal-row')) closeAllGoalSwipes();
+  if (!e.target.closest('.challenge-row')) closeAllChallengeSwipes();
 }, { passive: true });
 
 document.addEventListener('click', e => {
   if (!e.target.closest('.goal-row')) closeAllGoalSwipes();
+  if (!e.target.closest('.challenge-row')) closeAllChallengeSwipes();
 });
 
 /* ── SAVE CHALLENGE ── */
