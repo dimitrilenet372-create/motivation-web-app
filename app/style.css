@@ -475,6 +475,9 @@ body {
 .goal-card.paused .goal-name,
 .goal-card.paused .goal-prog { color: var(--gray); }
 
+.goal-row.is-paused .goal-swipe-actions { display: none; }
+.goal-row.is-paused .goal-card { cursor: pointer; }
+
 
 .btn-add-first-goal {
   width: 100%; padding: 16px;

@@ -145,7 +145,7 @@ function goalCardHTML(g) {
     : `border-left:5px solid ${col.border};background:${col.bg}`;
   const fillStyle = g.paused ? 'background:var(--c-yellow)' : `background:${col.border}`;
   return `
-    <div class="goal-row" data-id="${g.id}">
+    <div class="goal-row ${g.paused ? 'is-paused' : ''}" data-id="${g.id}">
       <div class="goal-swipe-actions">
         <button class="goal-swipe-pause" data-id="${g.id}">
           <span class="goal-swipe-icon">${g.paused ? '▶' : '⏸'}</span>
@@ -335,6 +335,11 @@ function buildCatGrid(containerId, onSelect) {
 /* ── GOAL SWIPE ── */
 const SWIPE_W = 130;
 
+function togglePause(id) {
+  const g = state.goals.find(x => x.id === id);
+  if (g) { g.paused = !g.paused; save(); renderGoalsList(); }
+}
+
 function initGoalSwipe(container) {
   container.querySelectorAll('.goal-row').forEach(row => {
     const card = row.querySelector('.goal-card');
@@ -350,6 +355,7 @@ function initGoalSwipe(container) {
 
     card.addEventListener('touchmove', e => {
       if (!tracking) return;
+      if (row.classList.contains('is-paused')) { tracking = false; return; }
       const dx = e.touches[0].clientX - startX;
       const dy = e.touches[0].clientY - startY;
       if (!row._swiped && Math.abs(dy) > Math.abs(dx) + 4) { tracking = false; return; }
@@ -363,6 +369,13 @@ function initGoalSwipe(container) {
       tracking = false;
       card.style.transition = `transform 0.28s var(--ease-out)`;
       const dx = e.changedTouches[0].clientX - startX;
+      const dy = e.changedTouches[0].clientY - startY;
+      const isTap = Math.abs(dx) < 8 && Math.abs(dy) < 8;
+
+      if (row.classList.contains('is-paused')) {
+        if (isTap) togglePause(row.dataset.id);
+        return;
+      }
       const base = row._swiped ? -SWIPE_W : 0;
       if (base + dx < -SWIPE_W / 3) {
         openGoalSwipe(row);
@@ -374,6 +387,7 @@ function initGoalSwipe(container) {
     card.addEventListener('click', e => {
       if (row._wasTouched) { row._wasTouched = false; return; }
       if (e.target.closest('.goal-action')) return;
+      if (row.classList.contains('is-paused')) { togglePause(row.dataset.id); return; }
       row._swiped ? closeGoalSwipe(row) : openGoalSwipe(row);
     });
   });
