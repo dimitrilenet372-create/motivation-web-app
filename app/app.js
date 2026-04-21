@@ -53,6 +53,13 @@ function isDoneToday(challenge) {
   return (challenge.completions || []).includes(today());
 }
 
+/* Maps real % to a more visible fill % (power curve + minimum) */
+function visualFill(pct, minPct = 8) {
+  if (pct <= 0) return 0;
+  if (pct >= 100) return 100;
+  return Math.max(minPct, Math.round(Math.pow(pct / 100, 0.5) * 100));
+}
+
 /* ── ROUTING ── */
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -139,7 +146,7 @@ function renderGoalsList() {
 }
 
 function goalCardHTML(g) {
-  const pct = Math.min(100, (g.progress / g.target) * 100).toFixed(1);
+  const pct = Math.min(100, (g.progress / g.target) * 100);
   const complete = g.progress >= g.target;
   const col = (g.paused || complete) ? null : GOAL_COLORS[g.colorIndex ?? 0];
   const cardStyle = complete
@@ -149,6 +156,7 @@ function goalCardHTML(g) {
       : `border-left:5px solid ${col.border};background:${col.bg}`;
   const fillStyle = g.paused ? 'background:var(--c-yellow)' : complete ? '' : `background:${col.border}`;
   const rowClass = complete ? 'is-complete' : g.paused ? 'is-paused' : '';
+  const barW = complete ? 100 : visualFill(pct, 5);
   return `
     <div class="goal-row ${rowClass}" data-id="${g.id}">
       <div class="goal-swipe-actions">
@@ -166,7 +174,7 @@ function goalCardHTML(g) {
         <div class="goal-info">
           <div class="goal-name">${g.name}${complete ? ' ✓' : ''}</div>
           <div class="goal-prog">${complete ? 'Objectif atteint 🎉' : `${g.progress}/${g.target}${g.paused ? ' · En pause' : ''}`}</div>
-          <div class="goal-prog-bar"><div class="goal-prog-fill" style="width:${pct}%;${fillStyle}"></div></div>
+          <div class="goal-prog-bar"><div class="goal-prog-fill" style="width:${barW}%;${fillStyle}"></div></div>
         </div>
         ${(!g.paused && !complete) ? `<button class="goal-action" data-id="${g.id}" style="background:${col.border}">+1</button>` : ''}
         ${complete ? `<span class="goal-complete-badge">🏆</span>` : ''}
@@ -186,9 +194,11 @@ function renderChallengesHome() {
 
 /* ── CHALLENGE CARD ── */
 function challengeCardHTML(c) {
-  const done = isDoneToday(c);
-  const pct  = Math.min(100, (c.progress / c.target) * 100).toFixed(1);
-  const colorClass = done ? 'done-today' : 'color-' + c.color;
+  const done     = isDoneToday(c);
+  const complete = c.progress >= c.target;
+  const pct      = Math.min(100, (c.progress / c.target) * 100);
+  const fill     = complete ? 100 : visualFill(pct);
+  const colorClass = complete ? 'is-complete' : done ? 'done-today' : 'color-' + c.color;
   return `
     <div class="challenge-row" data-id="${c.id}">
       <div class="challenge-swipe-del">
@@ -196,15 +206,15 @@ function challengeCardHTML(c) {
           <span class="ch-del-icon">✕</span>Supp.
         </button>
       </div>
-      <div class="challenge-card ${colorClass}" style="--fill:${pct}%">
+      <div class="challenge-card ${colorClass}" style="--fill:${fill}%">
         <div class="ch-avatar">${c.emoji}</div>
         <div class="ch-info">
-          <div class="ch-name">${c.name}</div>
-          <div class="ch-prog">${c.progress}/${c.target}</div>
+          <div class="ch-name">${c.name}${complete ? ' ✓' : ''}</div>
+          <div class="ch-prog">${complete ? 'Challenge terminé 🎉' : `${c.progress}/${c.target}`}</div>
         </div>
-        <button class="ch-action ${done ? 'done' : ''}" data-id="${c.id}">
-          ${done ? '✓' : '+1'}
-        </button>
+        ${complete
+          ? '<span class="ch-complete-badge">🏆</span>'
+          : `<button class="ch-action ${done ? 'done' : ''}" data-id="${c.id}">${done ? '✓' : '+1'}</button>`}
       </div>
     </div>`;
 }
@@ -213,7 +223,7 @@ function bindChallengeActions(container) {
   container.querySelectorAll('.ch-action').forEach(btn => {
     btn.addEventListener('click', () => {
       const c = state.challenges.find(x => x.id === btn.dataset.id);
-      if (!c || isDoneToday(c)) return;
+      if (!c || isDoneToday(c) || c.progress >= c.target) return;
       if (!c.completions) c.completions = [];
       c.completions.push(today());
       c.progress = Math.min(c.progress + 1, c.target);

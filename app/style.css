@@ -377,7 +377,7 @@ body {
   position: absolute;
   left: 0; top: 0; bottom: 0;
   width: var(--fill, 0%);
-  opacity: 0.22;
+  opacity: 0.32;
   transition: width 0.5s var(--ease-out);
   pointer-events: none;
   z-index: 0;
@@ -391,6 +391,7 @@ body {
 .challenge-card.color-purple { background: var(--c-purple-bg); }
 .challenge-card.color-pink   { background: var(--c-pink-bg);   }
 .challenge-card.done-today   { background: var(--c-green-bg); box-shadow: 0 0 0 2px var(--c-green); }
+.challenge-card.is-complete  { background: var(--c-green-bg); box-shadow: 0 0 0 2px var(--c-green); }
 
 .challenge-card.color-blue::before   { background: var(--c-blue);   }
 .challenge-card.color-green::before  { background: var(--c-green);  }
@@ -399,6 +400,9 @@ body {
 .challenge-card.color-purple::before { background: var(--c-purple); }
 .challenge-card.color-pink::before   { background: var(--c-pink);   }
 .challenge-card.done-today::before   { background: var(--c-green);  }
+.challenge-card.is-complete::before  { background: var(--c-green);  }
+
+.ch-complete-badge { font-size: 20px; flex-shrink: 0; }
 
 .ch-avatar {
   width: 44px; height: 44px;
