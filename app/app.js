@@ -521,6 +521,8 @@ document.addEventListener('click', e => {
 document.getElementById('save-challenge').addEventListener('click', () => {
   const name = document.getElementById('new-name').value.trim();
   if (!name || !addSelectedCat) return;
+  const tRaw = parseInt(document.getElementById('t-val').value);
+  const target = (!isNaN(tRaw) && tRaw >= 1) ? Math.min(3650, tRaw) : addTarget;
   state.challenges.push({
     id: uid(),
     name,
@@ -528,7 +530,7 @@ document.getElementById('save-challenge').addEventListener('click', () => {
     color: addSelectedCat.color,
     category: addSelectedCat.id,
     progress: 0,
-    target: addTarget,
+    target,
     completions: [],
     createdAt: today(),
   });
@@ -610,13 +612,15 @@ document.getElementById('g-presets').addEventListener('click', e => {
 document.getElementById('save-goal').addEventListener('click', () => {
   const name = document.getElementById('goal-name').value.trim();
   if (!name) return;
+  const gRaw = parseInt(document.getElementById('g-val').value);
+  const target = (!isNaN(gRaw) && gRaw >= 1) ? Math.min(3650, gRaw) : goalTarget;
   state.goals.push({
     id: uid(),
     name,
     emoji: goalSelectedCat ? goalSelectedCat.emoji : '🎯',
     colorIndex: state.goals.length % GOAL_COLORS.length,
     progress: 0,
-    target: goalTarget,
+    target,
   });
   save();
   document.getElementById('goal-modal').classList.add('hidden');

@@ -498,11 +498,12 @@ body {
 .goal-card.paused .goal-name,
 .goal-card.paused .goal-prog { color: var(--gray); }
 
-.goal-row.is-paused .goal-swipe-actions { display: none; }
+/* Paused goal — card click resumes, swipe shows only Delete */
+.goal-row.is-paused .goal-swipe-pause { display: none; }
 .goal-row.is-paused .goal-card { cursor: pointer; }
 
-/* Completed goal */
-.goal-row.is-complete .goal-swipe-actions { display: none; }
+/* Completed goal — no pause option, only Delete */
+.goal-row.is-complete .goal-swipe-pause { display: none; }
 .goal-row.is-complete .goal-card {
   border-left-color: var(--c-green) !important;
   background: var(--c-green-bg) !important;
