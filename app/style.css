@@ -495,9 +495,34 @@ body {
 .counter-val {
   font-family: var(--font-serif);
   font-size: 48px; font-weight: 700;
-  min-width: 90px; text-align: center;
+  width: 120px; text-align: center;
   color: var(--orange);
+  border: none; background: transparent; outline: none;
+  -moz-appearance: textfield;
 }
+.counter-val::-webkit-inner-spin-button,
+.counter-val::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+.target-presets {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: -4px;
+  padding-bottom: 4px;
+}
+.preset-btn {
+  padding: 6px 16px;
+  background: var(--gray-l);
+  border: 1.5px solid transparent;
+  border-radius: 20px;
+  font-size: 13px; font-weight: 600;
+  font-family: var(--font-sans);
+  color: var(--dark);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.preset-btn:hover { background: var(--orange-l); color: var(--orange-d); }
+.preset-btn.active { background: var(--orange-l); border-color: var(--orange); color: var(--orange-d); }
 
 /* ══════════════════════════════════════════
    TRACKING — flashy progress cards

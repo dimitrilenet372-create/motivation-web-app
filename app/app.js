@@ -291,10 +291,17 @@ function renderProfile() {
 let addSelectedCat = null;
 let addTarget = 365;
 
+function syncPresets(presetsId, val) {
+  document.querySelectorAll(`#${presetsId} .preset-btn`).forEach(btn => {
+    btn.classList.toggle('active', Number(btn.dataset.days) === val);
+  });
+}
+
 function renderAddTab() {
   addSelectedCat = null;
   addTarget = 365;
-  document.getElementById('t-val').textContent = addTarget;
+  document.getElementById('t-val').value = addTarget;
+  syncPresets('t-presets', addTarget);
   document.getElementById('new-name').value = '';
   document.getElementById('add-form').classList.add('hidden');
   buildCatGrid('add-cat-grid', (cat) => {
@@ -342,11 +349,25 @@ document.getElementById('save-challenge').addEventListener('click', () => {
 
 document.getElementById('t-minus').addEventListener('click', () => {
   addTarget = Math.max(1, addTarget - 1);
-  document.getElementById('t-val').textContent = addTarget;
+  document.getElementById('t-val').value = addTarget;
+  syncPresets('t-presets', addTarget);
 });
 document.getElementById('t-plus').addEventListener('click', () => {
   addTarget = Math.min(3650, addTarget + 1);
-  document.getElementById('t-val').textContent = addTarget;
+  document.getElementById('t-val').value = addTarget;
+  syncPresets('t-presets', addTarget);
+});
+document.getElementById('t-val').addEventListener('input', () => {
+  const v = parseInt(document.getElementById('t-val').value);
+  if (!isNaN(v) && v >= 1) addTarget = Math.min(3650, v);
+  syncPresets('t-presets', addTarget);
+});
+document.getElementById('t-presets').addEventListener('click', e => {
+  const btn = e.target.closest('.preset-btn');
+  if (!btn) return;
+  addTarget = Number(btn.dataset.days);
+  document.getElementById('t-val').value = addTarget;
+  syncPresets('t-presets', addTarget);
 });
 
 /* ── GOAL MODAL ── */
@@ -358,7 +379,8 @@ document.getElementById('add-goal-btn').addEventListener('click', openGoalModal)
 function openGoalModal() {
   goalSelectedCat = null;
   goalTarget = 365;
-  document.getElementById('g-val').textContent = goalTarget;
+  document.getElementById('g-val').value = goalTarget;
+  syncPresets('g-presets', goalTarget);
   document.getElementById('goal-name').value = '';
   buildCatGrid('goal-cat-grid', (cat) => {
     goalSelectedCat = cat;
@@ -376,11 +398,25 @@ document.getElementById('goal-modal').addEventListener('click', (e) => {
 });
 document.getElementById('g-minus').addEventListener('click', () => {
   goalTarget = Math.max(1, goalTarget - 1);
-  document.getElementById('g-val').textContent = goalTarget;
+  document.getElementById('g-val').value = goalTarget;
+  syncPresets('g-presets', goalTarget);
 });
 document.getElementById('g-plus').addEventListener('click', () => {
   goalTarget = Math.min(3650, goalTarget + 1);
-  document.getElementById('g-val').textContent = goalTarget;
+  document.getElementById('g-val').value = goalTarget;
+  syncPresets('g-presets', goalTarget);
+});
+document.getElementById('g-val').addEventListener('input', () => {
+  const v = parseInt(document.getElementById('g-val').value);
+  if (!isNaN(v) && v >= 1) goalTarget = Math.min(3650, v);
+  syncPresets('g-presets', goalTarget);
+});
+document.getElementById('g-presets').addEventListener('click', e => {
+  const btn = e.target.closest('.preset-btn');
+  if (!btn) return;
+  goalTarget = Number(btn.dataset.days);
+  document.getElementById('g-val').value = goalTarget;
+  syncPresets('g-presets', goalTarget);
 });
 document.getElementById('save-goal').addEventListener('click', () => {
   const name = document.getElementById('goal-name').value.trim();
