@@ -184,14 +184,11 @@ function challengeCardHTML(c) {
   const pct  = Math.min(100, (c.progress / c.target) * 100).toFixed(1);
   const colorClass = done ? 'done-today' : 'color-' + c.color;
   return `
-    <div class="challenge-card ${colorClass}">
+    <div class="challenge-card ${colorClass}" style="--fill:${pct}%">
       <div class="ch-avatar">${c.emoji}</div>
       <div class="ch-info">
         <div class="ch-name">${c.name}</div>
         <div class="ch-prog">${c.progress}/${c.target}</div>
-        <div class="ch-progress-bar">
-          <div class="ch-progress-fill" style="width:${pct}%"></div>
-        </div>
       </div>
       <button class="ch-action ${done ? 'done' : ''}" data-id="${c.id}">
         ${done ? '✓' : '+1'}
