@@ -13,14 +13,18 @@
   --orange-l:     #FED7AA;
   --yellow:       #EAB308;
   --yellow-l:     #FEF08A;
+  --amber:        #FBBF24;
   --cream:        #FEF9E7;
   --white:        #FFFFFF;
   --dark:         #1C1C1E;
   --dark2:        #2C2C2E;
   --gray:         #6B6B6B;
-  --gray-l:       #D1CFC6;
+  --gray-l:       #EDE9E3;
   --bg:           #FFFFFF;
-  --border:       #EBEBEB;
+  --bg-off:       #FAFAF7;
+  --bg-warm:      #F5F0EB;
+  --bg-orange:    var(--bg-orange);
+  --border:       #E8E4DD;
 
   --green-c:      #6B7F3E;
   --green-bg:     #EDF2E0;
@@ -28,6 +32,13 @@
   --red-bg:       #F5E0E0;
   --blue-c:       #5B7A9C;
   --blue-bg:      #E0ECF5;
+
+  --c-blue:       #2563EB; --c-blue-bg:   #BFDBFE;
+  --c-green:      #16A34A; --c-green-bg:  #BBFFD5;
+  --c-red:        #DC2626; --c-red-bg:    #FFC9C9;
+  --c-yellow:     #CA8A04; --c-yellow-bg: #FEF08A;
+  --c-purple:     #7C3AED; --c-purple-bg: #E9D5FF;
+  --c-pink:       #DB2777; --c-pink-bg:   #FCE7F3;
 
   --font-serif:   'Playfair Display', Georgia, serif;
   --font-sans:    'DM Sans', system-ui, sans-serif;
@@ -39,6 +50,16 @@
 
   --max:   1160px;
   --gutter: clamp(20px, 5vw, 60px);
+
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-md: 0 8px 24px rgba(0,0,0,0.08);
+  --shadow-lg: 0 16px 48px rgba(0,0,0,0.10);
+
+  --ease-out: cubic-bezier(.16,1,.3,1);
+  --ease-spring: cubic-bezier(.34,1.56,.64,1);
+  --dur-fast:  0.12s;
+  --dur-base:  0.2s;
+  --dur-slow:  0.35s;
 }
 
 html {
@@ -103,16 +124,16 @@ img { display: block; max-width: 100%; }
   position: relative;
 }
 .nav-sun-inner {
-  width: 22px; height: 22px;
+  width: 69%; height: 69%;
   background: var(--yellow);
   border-radius: 28%;
   display: flex; align-items: flex-start; justify-content: flex-end;
-  padding: 12%;
+  padding: 10%;
   box-sizing: border-box;
   flex-shrink: 0;
 }
 .nav-sun-dot {
-  width: 7px; height: 7px;
+  width: 14%; height: 14%;
   background: var(--cream);
   border-radius: 28%;
   flex-shrink: 0;
@@ -380,7 +401,7 @@ section { padding: clamp(64px, 10vh, 120px) 0; }
 /* ══════════════════════════════════════════
    FEATURES
 ══════════════════════════════════════════ */
-.features { background: #FAFAF7; }
+.features { background: var(--bg-off); }
 
 .features-grid {
   display: grid;
@@ -397,7 +418,7 @@ section { padding: clamp(64px, 10vh, 120px) 0; }
 }
 .feature-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-lg);
 }
 
 .fc-icon {
@@ -469,7 +490,7 @@ section { padding: clamp(64px, 10vh, 120px) 0; }
 
 /* Step visuals */
 .step-visual {
-  background: #FAFAF7;
+  background: var(--bg-off);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
   padding: 28px;
@@ -495,7 +516,7 @@ section { padding: clamp(64px, 10vh, 120px) 0; }
   transition: border-color 0.15s, background 0.15s;
 }
 .cmg-cell span { font-size: 11px; font-weight: 600; color: var(--dark); }
-.cmg-cell.sel  { border-color: var(--orange); background: #FFF5EE; }
+.cmg-cell.sel  { border-color: var(--orange); background: var(--bg-orange); }
 .cmg-cell.sel span { color: var(--orange-d); }
 .cmg-cell:hover:not(.sel) { border-color: var(--gray-l); }
 
@@ -562,7 +583,7 @@ section { padding: clamp(64px, 10vh, 120px) 0; }
 /* ══════════════════════════════════════════
    CATEGORIES
 ══════════════════════════════════════════ */
-.cats-section { background: #FAFAF7; }
+.cats-section { background: var(--bg-off); }
 
 .cats-scroll {
   display: flex;
@@ -585,7 +606,7 @@ section { padding: clamp(64px, 10vh, 120px) 0; }
 }
 .cat-pill:hover {
   border-color: var(--orange);
-  background: #FFF5EE;
+  background: var(--bg-orange);
   color: var(--orange-d);
   transform: translateY(-2px);
 }
@@ -688,7 +709,7 @@ section { padding: clamp(64px, 10vh, 120px) 0; }
 /* ══════════════════════════════════════════
    CTA SECTION
 ══════════════════════════════════════════ */
-.cta-section { background: #FAFAF7; }
+.cta-section { background: var(--bg-off); }
 
 .cta-inner {
   text-align: center;
@@ -710,15 +731,15 @@ section { padding: clamp(64px, 10vh, 120px) 0; }
   animation: sun-float 5s ease-in-out infinite;
 }
 .cta-sun-inner {
-  width: 52px; height: 52px;
+  width: 69%; height: 69%;
   background: var(--yellow);
   border-radius: 28%;
   display: flex; align-items: flex-start; justify-content: flex-end;
-  padding: 12%;
+  padding: 10%;
   box-sizing: border-box;
 }
 .cta-sun-dot {
-  width: 14px; height: 14px;
+  width: 14%; height: 14%;
   background: var(--cream);
   border-radius: 28%;
   flex-shrink: 0;
