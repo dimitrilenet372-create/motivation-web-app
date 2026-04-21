@@ -347,6 +347,7 @@ function initGoalSwipe(container) {
       startX = e.touches[0].clientX;
       startY = e.touches[0].clientY;
       tracking = true;
+      row._wasTouched = true;
       card.style.transition = 'none';
     }, { passive: true });
 
@@ -373,8 +374,10 @@ function initGoalSwipe(container) {
       }
     });
 
-    card.addEventListener('click', () => {
-      if (row._swiped) closeGoalSwipe(row);
+    card.addEventListener('click', e => {
+      if (row._wasTouched) { row._wasTouched = false; return; }
+      if (e.target.closest('.goal-action')) return;
+      row._swiped ? closeGoalSwipe(row) : openGoalSwipe(row);
     });
   });
 }
@@ -401,6 +404,10 @@ function closeAllGoalSwipes() {
 document.addEventListener('touchstart', e => {
   if (!e.target.closest('.goal-row')) closeAllGoalSwipes();
 }, { passive: true });
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.goal-row')) closeAllGoalSwipes();
+});
 
 /* ── SAVE CHALLENGE ── */
 document.getElementById('save-challenge').addEventListener('click', () => {

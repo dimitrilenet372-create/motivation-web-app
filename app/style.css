@@ -465,10 +465,6 @@ body {
 .goal-card.paused .goal-name,
 .goal-card.paused .goal-prog { color: var(--gray); }
 
-/* Desktop: reveal on hover */
-@media (hover: hover) {
-  .goal-row:hover .goal-card { transform: translateX(-130px); }
-}
 
 .btn-add-first-goal {
   width: 100%; padding: 16px;
