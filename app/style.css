@@ -378,7 +378,7 @@ body {
   left: 0; top: 0; bottom: 0;
   width: var(--fill, 0%);
   opacity: 0.32;
-  transition: width 0.5s var(--ease-out);
+  transition: width 0.6s cubic-bezier(0.34, 1.4, 0.64, 1);
   pointer-events: none;
   z-index: 0;
 }
@@ -489,7 +489,7 @@ body {
 }
 .goal-prog-fill {
   height: 100%; background: var(--orange); border-radius: 3px;
-  transition: width 0.4s ease;
+  transition: width 0.55s cubic-bezier(0.34, 1.4, 0.64, 1);
 }
 .goal-action {
   width: 34px; height: 34px; border-radius: 50%;
@@ -521,14 +521,14 @@ body {
 .toast {
   position: absolute;
   bottom: 90px; left: 50%;
-  transform: translateX(-50%) translateY(12px);
+  transform: translateX(-50%) translateY(0);
   background: var(--dark); color: white;
   padding: 11px 22px; border-radius: 50px;
   font-size: 14px; font-weight: 600;
-  opacity: 0; transition: opacity 0.22s, transform 0.22s;
-  z-index: 200; white-space: nowrap; pointer-events: none;
+  opacity: 0; z-index: 200; white-space: nowrap; pointer-events: none;
 }
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.show { animation: toastSpring 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+.toast.hide { animation: toastOut 0.28s ease-in forwards; }
 
 
 .btn-add-first-goal {
@@ -737,6 +737,69 @@ body {
 
 @keyframes fade-in  { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slide-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+/* ── SATISFYING ANIMATIONS ── */
+@keyframes floatUp {
+  0%   { opacity: 1; transform: translate(-50%, 0) scale(1.1); }
+  100% { opacity: 0; transform: translate(-50%, -56px) scale(0.6); }
+}
+@keyframes confettiFly {
+  0%   { opacity: 1; transform: translate(0,0) scale(1) rotate(0deg); }
+  100% { opacity: 0; transform: translate(var(--tx),var(--ty)) scale(0) rotate(var(--tr)); }
+}
+@keyframes pulsRing {
+  0%   { box-shadow: 0 0 0 0 var(--ring-col, rgba(22,163,74,.55)); }
+  65%  { box-shadow: 0 0 0 20px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes checkIn {
+  0%   { transform: scale(0) rotate(-20deg); opacity: 0; }
+  60%  { transform: scale(1.28) rotate(6deg); opacity: 1; }
+  80%  { transform: scale(0.91) rotate(-2deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+@keyframes toastSpring {
+  0%   { opacity: 0; transform: translateX(-50%) translateY(22px) scale(0.78); }
+  55%  { opacity: 1; transform: translateX(-50%) translateY(-5px) scale(1.05); }
+  80%  { transform: translateX(-50%) translateY(2px) scale(0.98); }
+  100% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+}
+@keyframes toastOut {
+  from { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+  to   { opacity: 0; transform: translateX(-50%) translateY(16px) scale(0.86); }
+}
+
+/* Physical button press */
+.goal-action:active             { transform: scale(0.76) !important; transition: transform 0.07s !important; }
+.ch-action:not(.done):active    { transform: scale(0.76) !important; transition: transform 0.07s !important; }
+
+/* ✓ bounces in when challenge/goal is completed (new DOM element) */
+.ch-action.done                 { animation: checkIn 0.42s cubic-bezier(0.34,1.56,0.64,1) both; }
+.goal-complete-badge            { animation: checkIn 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.08s both; }
+.ch-complete-badge              { animation: checkIn 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.08s both; }
+
+/* Pulse ring (toggled via JS on completion) */
+.anim-ring                      { animation: pulsRing 0.75s ease-out forwards; }
+
+/* Floating "+1" label (injected by JS) */
+.float-label {
+  position: fixed;
+  font-family: var(--font-sans); font-weight: 900; font-size: 18px;
+  color: white; text-shadow: 0 2px 10px rgba(0,0,0,0.28);
+  pointer-events: none; z-index: 9999;
+  animation: floatUp 0.72s cubic-bezier(0.22,1,0.36,1) forwards;
+}
+
+/* Confetti dots (injected by JS) */
+.confetti-bit {
+  position: fixed; width: 10px; height: 10px;
+  pointer-events: none; z-index: 9998;
+  animation: confettiFly 0.65s cubic-bezier(0.22,1,0.36,1) forwards;
+}
 
 /* ── LISTS ── */
 #all-challenges-list,

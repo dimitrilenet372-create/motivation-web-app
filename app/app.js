@@ -75,9 +75,9 @@ function showTab(id) {
   renderCurrentTab(id);
 }
 
-function renderCurrentTab(id) {
-  if (id === 'tab-home')       renderHome();
-  if (id === 'tab-challenges') renderAllChallenges();
+function renderCurrentTab(id, animate = true) {
+  if (id === 'tab-home')       renderHome(animate);
+  if (id === 'tab-challenges') renderAllChallenges(animate);
   if (id === 'tab-tracking')   renderTracking();
   if (id === 'tab-profile')    renderProfile();
   if (id === 'tab-add')        renderAddTab();
@@ -102,14 +102,14 @@ function renderWeekStrip() {
 }
 
 /* ── HOME ── */
-function renderHome() {
+function renderHome(animate = true) {
   document.getElementById('user-name-display').textContent = state.user.name;
   renderWeekStrip();
-  renderGoalsList();
-  renderChallengesHome();
+  renderGoalsList(animate);
+  renderChallengesHome(animate);
 }
 
-function renderGoalsList() {
+function renderGoalsList(animate = true) {
   const el = document.getElementById('goals-list');
   if (!state.goals.length) {
     el.innerHTML = '<button class="btn-add-first-goal" id="add-first-goal">Add your first goal</button>';
@@ -117,14 +117,23 @@ function renderGoalsList() {
     return;
   }
   el.innerHTML = state.goals.map(g => goalCardHTML(g)).join('');
+  if (animate) addEntryStagger(el, '.goal-row');
   el.querySelectorAll('.goal-action').forEach(btn => {
     btn.addEventListener('click', () => {
       const g = state.goals.find(x => x.id === btn.dataset.id);
-      if (g && !g.paused && g.progress < g.target) {
-        g.progress++;
-        save();
-        renderGoalsList();
-        if (g.progress >= g.target) showToast(`🏆 ${g.name} — objectif atteint !`);
+      if (!g || g.paused || g.progress >= g.target) return;
+      const r = btn.getBoundingClientRect();
+      const col = GOAL_COLORS[g.colorIndex ?? 0];
+      spawnFloatText(r.left + r.width / 2, r.top, '+1', col.border);
+      g.progress++;
+      save();
+      const willComplete = g.progress >= g.target;
+      renderGoalsList(false);
+      if (willComplete) {
+        const newCard = el.querySelector(`.goal-row[data-id="${g.id}"] .goal-card`);
+        pulseRing(newCard, 'rgba(22,163,74,.55)');
+        spawnConfetti(r.left + r.width / 2, r.top + r.height / 2);
+        showToast(`🏆 ${g.name} — objectif atteint !`);
       }
     });
   });
@@ -182,13 +191,14 @@ function goalCardHTML(g) {
     </div>`;
 }
 
-function renderChallengesHome() {
+function renderChallengesHome(animate = true) {
   const el = document.getElementById('challenges-home-list');
   if (!state.challenges.length) {
     el.innerHTML = '<div class="empty-state">Aucun challenge — va dans "Add" pour en créer un</div>';
     return;
   }
   el.innerHTML = state.challenges.slice(0, 5).map(c => challengeCardHTML(c)).join('');
+  if (animate) addEntryStagger(el, '.challenge-row');
   bindChallengeActions(el);
 }
 
@@ -219,16 +229,37 @@ function challengeCardHTML(c) {
     </div>`;
 }
 
+const CAT_COLORS = { blue:'#2563EB', green:'#16A34A', red:'#DC2626', yellow:'#CA8A04', purple:'#7C3AED', pink:'#DB2777' };
+
 function bindChallengeActions(container) {
   container.querySelectorAll('.ch-action').forEach(btn => {
     btn.addEventListener('click', () => {
       const c = state.challenges.find(x => x.id === btn.dataset.id);
       if (!c || isDoneToday(c) || c.progress >= c.target) return;
+      const r   = btn.getBoundingClientRect();
+      const col = CAT_COLORS[c.color] || '#F97316';
+      spawnFloatText(r.left + r.width / 2, r.top, '+1', col);
       if (!c.completions) c.completions = [];
       c.completions.push(today());
       c.progress = Math.min(c.progress + 1, c.target);
       save();
-      renderCurrentTab(document.querySelector('.tab.active').id);
+      const willComplete = c.progress >= c.target;
+      const cid = c.id;
+      const activeTabId = document.querySelector('.tab.active').id;
+      /* Re-render without stagger so other cards don't dance on each tap */
+      if (activeTabId === 'tab-home') {
+        renderChallengesHome(false);
+        renderGoalsList(false);
+      } else if (activeTabId === 'tab-challenges') {
+        renderAllChallenges(false);
+      }
+      if (willComplete) {
+        const activeTab = document.querySelector('.tab.active');
+        const newCard = activeTab.querySelector(`.challenge-row[data-id="${cid}"] .challenge-card`);
+        pulseRing(newCard, `${col}88`);
+        spawnConfetti(r.left + r.width / 2, r.top + r.height / 2);
+        showToast(`🏆 ${c.name} — challenge terminé !`);
+      }
     });
   });
   container.querySelectorAll('.ch-del-btn').forEach(btn => {
@@ -243,13 +274,14 @@ function bindChallengeActions(container) {
 }
 
 /* ── ALL CHALLENGES ── */
-function renderAllChallenges() {
+function renderAllChallenges(animate = true) {
   const el = document.getElementById('all-challenges-list');
   if (!state.challenges.length) {
     el.innerHTML = '<div class="empty-state" style="margin:0">Aucun challenge</div>';
     return;
   }
   el.innerHTML = state.challenges.map(c => challengeCardHTML(c)).join('');
+  if (animate) addEntryStagger(el, '.challenge-row');
   bindChallengeActions(el);
 }
 
@@ -372,8 +404,55 @@ function showToast(msg) {
   requestAnimationFrame(() => { requestAnimationFrame(() => t.classList.add('show')); });
   setTimeout(() => {
     t.classList.remove('show');
+    t.classList.add('hide');
     setTimeout(() => t.remove(), 300);
   }, 2800);
+}
+
+/* ── ANIMATION HELPERS ── */
+function spawnFloatText(x, y, text, color) {
+  const el = document.createElement('div');
+  el.className = 'float-label';
+  el.textContent = text;
+  el.style.cssText = `left:${x}px; top:${y}px; color:${color};`;
+  document.body.appendChild(el);
+  el.addEventListener('animationend', () => el.remove(), { once: true });
+}
+
+function spawnConfetti(x, y) {
+  const COLS = ['#F97316','#2563EB','#16A34A','#7C3AED','#DB2777','#CA8A04','#FBBF24','#DC2626'];
+  for (let i = 0; i < 20; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'confetti-bit';
+    const angle = (i / 20) * 2 * Math.PI + Math.random() * 0.5;
+    const dist  = 40 + Math.random() * 65;
+    dot.style.cssText = `
+      left:${x}px; top:${y}px;
+      background:${COLS[i % COLS.length]};
+      --tx:${(Math.cos(angle) * dist).toFixed(1)}px;
+      --ty:${(Math.sin(angle) * dist).toFixed(1)}px;
+      --tr:${Math.round(Math.random() * 540)}deg;
+      animation-delay:${(Math.random() * 0.08).toFixed(3)}s;
+      border-radius:${Math.random() > 0.5 ? '50%' : '3px'};
+    `;
+    document.body.appendChild(dot);
+    dot.addEventListener('animationend', () => dot.remove(), { once: true });
+  }
+}
+
+function pulseRing(el, color = 'rgba(22,163,74,.55)') {
+  if (!el) return;
+  el.style.setProperty('--ring-col', color);
+  el.classList.remove('anim-ring');
+  void el.offsetWidth;
+  el.classList.add('anim-ring');
+  el.addEventListener('animationend', () => el.classList.remove('anim-ring'), { once: true });
+}
+
+function addEntryStagger(container, selector) {
+  container.querySelectorAll(selector).forEach((el, i) => {
+    el.style.animation = `fadeSlideUp 0.28s ease-out ${(i * 0.055).toFixed(3)}s both`;
+  });
 }
 
 /* ── GOAL SWIPE ── */
