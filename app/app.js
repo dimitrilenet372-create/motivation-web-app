@@ -129,8 +129,9 @@ function renderGoalsList(animate = true) {
       save();
       const willComplete = g.progress >= g.target;
       renderGoalsList(false);
+      const newCard = el.querySelector(`.goal-row[data-id="${g.id}"] .goal-card`);
+      addShine(newCard);
       if (willComplete) {
-        const newCard = el.querySelector(`.goal-row[data-id="${g.id}"] .goal-card`);
         pulseRing(newCard, 'rgba(22,163,74,.55)');
         spawnConfetti(r.left + r.width / 2, r.top + r.height / 2);
         showToast(`🏆 ${g.name} — objectif atteint !`);
@@ -158,14 +159,14 @@ function goalCardHTML(g) {
   const pct = Math.min(100, (g.progress / g.target) * 100);
   const complete = g.progress >= g.target;
   const col = (g.paused || complete) ? null : GOAL_COLORS[g.colorIndex ?? 0];
+  const fillColor = complete ? 'var(--c-green)' : g.paused ? 'var(--c-yellow)' : col.border;
+  const fill = complete ? 100 : visualFill(pct, 5);
   const cardStyle = complete
-    ? ''
+    ? `--fill:${fill}%;--fill-color:${fillColor}`
     : g.paused
-      ? 'border-left:5px solid var(--c-yellow);background:#FFFBEB;opacity:0.75'
-      : `border-left:5px solid ${col.border};background:${col.bg}`;
-  const fillStyle = g.paused ? 'background:var(--c-yellow)' : complete ? '' : `background:${col.border}`;
+      ? `--fill:${fill}%;--fill-color:${fillColor};border-left:5px solid var(--c-yellow);background:#FFFBEB;opacity:0.75`
+      : `--fill:${fill}%;--fill-color:${fillColor};border-left:5px solid ${col.border};background:${col.bg}`;
   const rowClass = complete ? 'is-complete' : g.paused ? 'is-paused' : '';
-  const barW = complete ? 100 : visualFill(pct, 5);
   return `
     <div class="goal-row ${rowClass}" data-id="${g.id}">
       <div class="goal-swipe-actions">
@@ -183,7 +184,6 @@ function goalCardHTML(g) {
         <div class="goal-info">
           <div class="goal-name">${g.name}${complete ? ' ✓' : ''}</div>
           <div class="goal-prog">${complete ? 'Objectif atteint 🎉' : `${g.progress}/${g.target}${g.paused ? ' · En pause' : ''}`}</div>
-          <div class="goal-prog-bar"><div class="goal-prog-fill" style="width:${barW}%;${fillStyle}"></div></div>
         </div>
         ${(!g.paused && !complete) ? `<button class="goal-action" data-id="${g.id}" style="background:${col.border}">+1</button>` : ''}
         ${complete ? `<span class="goal-complete-badge">🏆</span>` : ''}
@@ -253,10 +253,11 @@ function bindChallengeActions(container) {
       } else if (activeTabId === 'tab-challenges') {
         renderAllChallenges(false);
       }
+      const activeTab = document.querySelector('.tab.active');
+      const newChCard = activeTab.querySelector(`.challenge-row[data-id="${cid}"] .challenge-card`);
+      addShine(newChCard);
       if (willComplete) {
-        const activeTab = document.querySelector('.tab.active');
-        const newCard = activeTab.querySelector(`.challenge-row[data-id="${cid}"] .challenge-card`);
-        pulseRing(newCard, `${col}88`);
+        pulseRing(newChCard, `${col}88`);
         spawnConfetti(r.left + r.width / 2, r.top + r.height / 2);
         showToast(`🏆 ${c.name} — challenge terminé !`);
       }
@@ -453,6 +454,14 @@ function addEntryStagger(container, selector) {
   container.querySelectorAll(selector).forEach((el, i) => {
     el.style.animation = `fadeSlideUp 0.28s ease-out ${(i * 0.055).toFixed(3)}s both`;
   });
+}
+
+function addShine(el) {
+  if (!el) return;
+  el.classList.remove('anim-shine');
+  void el.offsetWidth;
+  el.classList.add('anim-shine');
+  setTimeout(() => el.classList.remove('anim-shine'), 700);
 }
 
 /* ── GOAL SWIPE ── */
