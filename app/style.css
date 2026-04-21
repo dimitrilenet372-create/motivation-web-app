@@ -399,17 +399,51 @@ body {
 }
 
 /* ── GOAL CARDS ── */
+.goal-row {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+/* Swipe-reveal action buttons (hidden behind the card) */
+.goal-swipe-actions {
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 130px;
+  display: flex;
+}
+.goal-swipe-pause,
+.goal-swipe-delete {
+  flex: 1;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 3px; border: none; cursor: pointer;
+  font-family: var(--font-sans); font-size: 11px; font-weight: 700;
+  color: white; letter-spacing: 0.02em;
+  transition: filter 0.15s;
+}
+.goal-swipe-pause  { background: var(--c-yellow); }
+.goal-swipe-delete { background: var(--c-red); }
+.goal-swipe-pause:hover  { filter: brightness(0.9); }
+.goal-swipe-delete:hover { filter: brightness(0.9); }
+.goal-swipe-icon { font-size: 18px; line-height: 1; }
+
 .goal-card {
   display: flex; align-items: center; gap: 12px;
   padding: 14px 16px;
-  border-radius: 16px; margin-bottom: 10px;
+  border-radius: 16px; margin-bottom: 0;
   background: white;
   border: none;
   border-left: 5px solid var(--orange);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  transform: translateX(0);
+  transition: transform 0.28s var(--ease-out);
+  will-change: transform;
 }
 .goal-emoji { font-size: 22px; flex-shrink: 0; }
-.goal-info  { flex: 1; }
+.goal-info  { flex: 1; min-width: 0; }
 .goal-name  { font-size: 15px; font-weight: 700; }
 .goal-prog  { font-size: 12px; color: var(--gray); margin-top: 2px; }
 .goal-prog-bar {
@@ -420,33 +454,21 @@ body {
   height: 100%; background: var(--orange); border-radius: 3px;
   transition: width 0.4s ease;
 }
-.goal-actions-wrap {
-  display: flex; flex-direction: column; align-items: center; gap: 5px; flex-shrink: 0;
-}
 .goal-action {
   width: 34px; height: 34px; border-radius: 50%;
-  border: none;
-  color: white;
+  border: none; color: white;
   font-size: 13px; font-weight: 800;
   cursor: pointer; display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  transition: all 0.15s;
+  flex-shrink: 0; transition: opacity 0.15s, transform 0.15s;
 }
-.goal-action:hover { opacity: 0.8; transform: scale(1.1); }
-.goal-pause-btn {
-  width: 26px; height: 26px; border-radius: 50%;
-  border: none; background: var(--c-yellow); color: white;
-  font-size: 10px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-}
-.goal-delete-btn {
-  width: 26px; height: 26px; border-radius: 50%;
-  border: none; background: var(--c-red); color: white;
-  font-size: 10px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-}
+.goal-action:hover { opacity: 0.8; transform: scale(1.08); }
 .goal-card.paused .goal-name,
-.goal-card.paused .goal-prog { color: var(--gray-l); }
+.goal-card.paused .goal-prog { color: var(--gray); }
+
+/* Desktop: reveal on hover */
+@media (hover: hover) {
+  .goal-row:hover .goal-card { transform: translateX(-130px); }
+}
 
 .btn-add-first-goal {
   width: 100%; padding: 16px;

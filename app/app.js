@@ -120,13 +120,13 @@ function renderGoalsList() {
       }
     });
   });
-  el.querySelectorAll('.goal-pause-btn').forEach(btn => {
+  el.querySelectorAll('.goal-swipe-pause').forEach(btn => {
     btn.addEventListener('click', () => {
       const g = state.goals.find(x => x.id === btn.dataset.id);
       if (g) { g.paused = !g.paused; save(); renderGoalsList(); }
     });
   });
-  el.querySelectorAll('.goal-delete-btn').forEach(btn => {
+  el.querySelectorAll('.goal-swipe-delete').forEach(btn => {
     btn.addEventListener('click', () => {
       if (!confirm('Supprimer ce goal ?')) return;
       state.goals = state.goals.filter(x => x.id !== btn.dataset.id);
@@ -134,29 +134,36 @@ function renderGoalsList() {
       renderGoalsList();
     });
   });
+  initGoalSwipe(el);
 }
 
 function goalCardHTML(g) {
   const pct = Math.min(100, (g.progress / g.target) * 100).toFixed(1);
   const col = g.paused ? null : GOAL_COLORS[g.colorIndex ?? 0];
   const cardStyle = g.paused
-    ? 'border-left:4px solid #CA8A04;background:#FFFBEB;opacity:0.7'
-    : `border-left:4px solid ${col.border};background:${col.bg}`;
-  const fillStyle = g.paused ? 'background:#CA8A04' : `background:${col.border}`;
+    ? 'border-left:5px solid var(--c-yellow);background:#FFFBEB;opacity:0.75'
+    : `border-left:5px solid ${col.border};background:${col.bg}`;
+  const fillStyle = g.paused ? 'background:var(--c-yellow)' : `background:${col.border}`;
   return `
-    <div class="goal-card ${g.paused ? 'paused' : ''}" style="${cardStyle}">
-      <span class="goal-emoji">${g.emoji}</span>
-      <div class="goal-info">
-        <div class="goal-name">${g.name}</div>
-        <div class="goal-prog">${g.progress}/${g.target}${g.paused ? ' · En pause' : ''}</div>
-        <div class="goal-prog-bar"><div class="goal-prog-fill" style="width:${pct}%;${fillStyle}"></div></div>
-      </div>
-      <div class="goal-actions-wrap">
-        ${!g.paused ? `<button class="goal-action" data-id="${g.id}" style="background:${col.border}">+1</button>` : ''}
-        <button class="goal-pause-btn" data-id="${g.id}" title="${g.paused ? 'Reprendre' : 'Pause'}">
-          ${g.paused ? '▶' : '⏸'}
+    <div class="goal-row" data-id="${g.id}">
+      <div class="goal-swipe-actions">
+        <button class="goal-swipe-pause" data-id="${g.id}">
+          <span class="goal-swipe-icon">${g.paused ? '▶' : '⏸'}</span>
+          ${g.paused ? 'Reprise' : 'Pause'}
         </button>
-        <button class="goal-delete-btn" data-id="${g.id}" title="Supprimer">✕</button>
+        <button class="goal-swipe-delete" data-id="${g.id}">
+          <span class="goal-swipe-icon">✕</span>
+          Supp.
+        </button>
+      </div>
+      <div class="goal-card ${g.paused ? 'paused' : ''}" style="${cardStyle}">
+        <span class="goal-emoji">${g.emoji}</span>
+        <div class="goal-info">
+          <div class="goal-name">${g.name}</div>
+          <div class="goal-prog">${g.progress}/${g.target}${g.paused ? ' · En pause' : ''}</div>
+          <div class="goal-prog-bar"><div class="goal-prog-fill" style="width:${pct}%;${fillStyle}"></div></div>
+        </div>
+        ${!g.paused ? `<button class="goal-action" data-id="${g.id}" style="background:${col.border}">+1</button>` : ''}
       </div>
     </div>`;
 }
@@ -327,6 +334,73 @@ function buildCatGrid(containerId, onSelect) {
     });
   });
 }
+
+/* ── GOAL SWIPE ── */
+const SWIPE_W = 130;
+
+function initGoalSwipe(container) {
+  container.querySelectorAll('.goal-row').forEach(row => {
+    const card = row.querySelector('.goal-card');
+    let startX = 0, startY = 0, tracking = false;
+
+    card.addEventListener('touchstart', e => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      tracking = true;
+      card.style.transition = 'none';
+    }, { passive: true });
+
+    card.addEventListener('touchmove', e => {
+      if (!tracking) return;
+      const dx = e.touches[0].clientX - startX;
+      const dy = e.touches[0].clientY - startY;
+      if (!row._swiped && Math.abs(dy) > Math.abs(dx) + 4) { tracking = false; return; }
+      const base = row._swiped ? -SWIPE_W : 0;
+      const x = Math.max(-SWIPE_W, Math.min(0, base + dx));
+      card.style.transform = `translateX(${x}px)`;
+    }, { passive: true });
+
+    card.addEventListener('touchend', e => {
+      if (!tracking) return;
+      tracking = false;
+      card.style.transition = `transform 0.28s var(--ease-out)`;
+      const dx = e.changedTouches[0].clientX - startX;
+      const base = row._swiped ? -SWIPE_W : 0;
+      if (base + dx < -SWIPE_W / 3) {
+        openGoalSwipe(row);
+      } else {
+        closeGoalSwipe(row);
+      }
+    });
+
+    card.addEventListener('click', () => {
+      if (row._swiped) closeGoalSwipe(row);
+    });
+  });
+}
+
+function openGoalSwipe(row) {
+  closeAllGoalSwipes();
+  const card = row.querySelector('.goal-card');
+  card.style.transition = `transform 0.28s var(--ease-out)`;
+  card.style.transform = `translateX(-${SWIPE_W}px)`;
+  row._swiped = true;
+}
+
+function closeGoalSwipe(row) {
+  const card = row.querySelector('.goal-card');
+  card.style.transition = `transform 0.28s var(--ease-out)`;
+  card.style.transform = 'translateX(0)';
+  row._swiped = false;
+}
+
+function closeAllGoalSwipes() {
+  document.querySelectorAll('.goal-row').forEach(r => { if (r._swiped) closeGoalSwipe(r); });
+}
+
+document.addEventListener('touchstart', e => {
+  if (!e.target.closest('.goal-row')) closeAllGoalSwipes();
+}, { passive: true });
 
 /* ── SAVE CHALLENGE ── */
 document.getElementById('save-challenge').addEventListener('click', () => {
