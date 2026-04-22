@@ -724,8 +724,7 @@ body {
 
 /* ── SCOREBOARD ── */
 .scoreboard-wrap {
-  width: 100%; margin: 16px 16px 0;
-  width: calc(100% - 32px);
+  margin: 20px 16px 0;
   background: var(--bg-off); border-radius: 24px;
   padding: 20px;
 }
@@ -817,16 +816,16 @@ body {
   bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
-  width: calc(100% - 32px);
-  max-width: 440px;
-  height: 64px;
+  width: calc(100% - 24px);
+  max-width: 460px;
+  height: 58px;
   background: #fff;
   border-radius: 32px;
   box-shadow: 0 4px 28px rgba(0,0,0,0.13);
   display: flex;
   align-items: center;
   justify-content: space-around;
-  padding: 0 8px;
+  padding: 0 4px;
   z-index: 100;
   flex-shrink: 0;
 }
@@ -851,9 +850,9 @@ body {
 }
 .nav-fab {
   position: absolute;
-  top: -28px;
-  width: 56px;
-  height: 56px;
+  top: -34px;
+  width: 68px;
+  height: 68px;
   border-radius: 50%;
   background: var(--orange);
   border: none;
