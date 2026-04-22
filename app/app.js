@@ -65,6 +65,16 @@ function computeScore() {
   return Math.round(sum / items.length * 100);
 }
 
+function toB64(str) {
+  return btoa(unescape(encodeURIComponent(str)))
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+function fromB64(str) {
+  str = str.replace(/-/g, '+').replace(/_/g, '/');
+  while (str.length % 4) str += '=';
+  return decodeURIComponent(escape(atob(str)));
+}
+
 function generateShareURL() {
   const payload = {
     n: state.user.name,
@@ -73,14 +83,26 @@ function generateShareURL() {
     g: state.goals.map(g => ({ e: g.emoji, n: g.name, p: g.progress, t: g.target })),
     d: today(),
   };
-  return `${location.origin}${location.pathname}?friend=${btoa(unescape(encodeURIComponent(JSON.stringify(payload))))}`;
+  return `${location.origin}${location.pathname}?friend=${toB64(JSON.stringify(payload))}`;
 }
 
-function parseFriendURL(url) {
+function parseFriendURL(input) {
   try {
-    const param = new URL(url).searchParams.get('friend');
+    input = input.trim();
+    let param = null;
+    /* Try full URL first */
+    if (input.startsWith('http')) {
+      try { param = new URL(input).searchParams.get('friend'); } catch {}
+    }
+    /* Fallback: extract ?friend= or &friend= from string */
+    if (!param) {
+      const m = input.match(/[?&]friend=([^&\s]+)/);
+      if (m) param = decodeURIComponent(m[1]);
+    }
+    /* Last resort: assume raw base64 was pasted */
+    if (!param) param = input;
     if (!param) return null;
-    return JSON.parse(decodeURIComponent(escape(atob(param))));
+    return JSON.parse(fromB64(param));
   } catch { return null; }
 }
 
@@ -96,11 +118,11 @@ function checkShareURL() {
   if (!param) return;
   history.replaceState({}, '', location.pathname);
   try {
-    const data = JSON.parse(decodeURIComponent(escape(atob(param))));
+    const data = JSON.parse(fromB64(param));
     if (!data?.n) return;
     if (confirm(`Ajouter ${data.n} à ton classement ? (Score : ${data.s} %)`)) {
       addFriend(data);
-      showTab('tab-profile');
+      showTab('tab-challenges');
     }
   } catch {}
 }
@@ -160,7 +182,7 @@ function showTab(id) {
 
 function renderCurrentTab(id, animate = true) {
   if (id === 'tab-home')       renderHome(animate);
-  if (id === 'tab-challenges') renderAllChallenges(animate);
+  if (id === 'tab-challenges') renderScoreboard();
   if (id === 'tab-tracking')   renderTracking();
   if (id === 'tab-profile')    renderProfile();
   if (id === 'tab-add')        renderAddTab();
@@ -439,7 +461,6 @@ function renderProfile() {
     <div class="stat-box"><div class="stat-num">${done}</div><div class="stat-label">Aujourd'hui</div></div>
     <div class="stat-box"><div class="stat-num">${best}</div><div class="stat-label">Best streak</div></div>
   `;
-  renderScoreboard();
 }
 
 function renderScoreboard() {
