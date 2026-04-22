@@ -813,24 +813,58 @@ body {
 
 /* ── BOTTOM NAV ── */
 .bottom-nav {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: 440px;
+  height: 64px;
+  background: #fff;
+  border-radius: 32px;
+  box-shadow: 0 4px 28px rgba(0,0,0,0.13);
   display: flex;
-  border-top: 1px solid var(--border);
-  background: rgba(255,255,255,0.96);
-  backdrop-filter: blur(16px);
-  padding: 8px 0 max(10px, env(safe-area-inset-bottom));
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 8px;
+  z-index: 100;
   flex-shrink: 0;
 }
 .nav-btn {
   flex: 1; background: none; border: none;
   padding: 6px 4px; cursor: pointer;
   display: flex; flex-direction: column; align-items: center; gap: 3px;
-  color: var(--gray);
+  color: #B0B0B0;
   font-family: var(--font-sans); font-size: 10px; font-weight: 600;
   transition: color 0.15s, transform 0.1s;
 }
-.nav-btn.active { color: var(--orange); }
-.nav-btn.active svg { filter: drop-shadow(0 2px 6px rgba(249,115,22,0.4)); }
-.nav-btn:hover  { color: var(--dark); transform: translateY(-1px); }
+.nav-btn.active { color: var(--dark); }
+.nav-btn:active { transform: scale(0.92); }
+
+/* FAB slot */
+.nav-fab-slot {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.nav-fab {
+  position: absolute;
+  top: -28px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--orange);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 20px rgba(249,115,22,0.45);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.nav-fab:active { transform: scale(0.9); box-shadow: 0 3px 10px rgba(249,115,22,0.35); }
 
 /* ── GOAL MODAL ── */
 .modal-overlay {

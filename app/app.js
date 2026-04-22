@@ -958,8 +958,10 @@ document.getElementById('save-goal').addEventListener('click', () => {
 document.querySelectorAll('.nav-btn').forEach(btn => {
   btn.addEventListener('click', () => showTab(btn.dataset.tab));
 });
+document.getElementById('nav-fab').addEventListener('click', () => showTab('tab-add'));
 
 /* ── PROFILE ACTIONS ── */
+document.getElementById('open-scores-btn').addEventListener('click', () => showTab('tab-challenges'));
 document.getElementById('edit-name-btn').addEventListener('click', () => {
   const name = prompt('Nouveau prénom :', state.user.name);
   if (name && name.trim()) {
