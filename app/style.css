@@ -485,12 +485,36 @@ body {
   content: '';
   position: absolute; left: 0; top: 0; bottom: 0;
   width: var(--fill, 0%);
-  background: var(--fill-color, var(--orange));
   opacity: 0.28;
   transition: width 0.55s cubic-bezier(0.34, 1.4, 0.64, 1);
   pointer-events: none; z-index: 0;
 }
 .goal-card > * { position: relative; z-index: 1; }
+
+/* Category colours — same palette as challenge cards */
+.goal-card.color-blue   { background: var(--c-blue-bg);   border-left-color: var(--c-blue); }
+.goal-card.color-green  { background: var(--c-green-bg);  border-left-color: var(--c-green); }
+.goal-card.color-red    { background: var(--c-red-bg);    border-left-color: var(--c-red); }
+.goal-card.color-yellow { background: var(--c-yellow-bg); border-left-color: var(--c-yellow); }
+.goal-card.color-purple { background: var(--c-purple-bg); border-left-color: var(--c-purple); }
+.goal-card.color-pink   { background: var(--c-pink-bg);   border-left-color: var(--c-pink); }
+
+.goal-card.color-blue::before   { background: var(--c-blue); }
+.goal-card.color-green::before  { background: var(--c-green); }
+.goal-card.color-red::before    { background: var(--c-red); }
+.goal-card.color-yellow::before { background: var(--c-yellow); }
+.goal-card.color-purple::before { background: var(--c-purple); }
+.goal-card.color-pink::before   { background: var(--c-pink); }
+
+.goal-card.color-blue   .goal-action { background: var(--c-blue); }
+.goal-card.color-green  .goal-action { background: var(--c-green); }
+.goal-card.color-red    .goal-action { background: var(--c-red); }
+.goal-card.color-yellow .goal-action { background: var(--c-yellow); }
+.goal-card.color-purple .goal-action { background: var(--c-purple); }
+.goal-card.color-pink   .goal-action { background: var(--c-pink); }
+
+.goal-row.is-paused .goal-card::before  { background: var(--c-yellow); }
+.goal-row.is-complete .goal-card::before { background: var(--c-green); }
 .goal-emoji { font-size: 22px; flex-shrink: 0; }
 .goal-info  { flex: 1; min-width: 0; }
 .goal-name  { font-size: 15px; font-weight: 700; }
@@ -508,7 +532,12 @@ body {
 
 /* Paused goal — card click resumes, swipe shows only Delete */
 .goal-row.is-paused .goal-swipe-pause { display: none; }
-.goal-row.is-paused .goal-card { cursor: pointer; }
+.goal-row.is-paused .goal-card {
+  cursor: pointer;
+  border-left-color: var(--c-yellow) !important;
+  background: #FFFBEB !important;
+  opacity: 0.75;
+}
 
 /* Completed goal — no pause option, only Delete */
 .goal-row.is-complete .goal-swipe-pause { display: none; }

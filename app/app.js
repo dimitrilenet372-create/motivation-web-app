@@ -25,6 +25,8 @@ const GOAL_COLORS = [
   { border: '#CA8A04', bg: '#FEF08A' }, // yellow
   { border: '#DC2626', bg: '#FFC9C9' }, // red
 ];
+/* Maps old colorIndex → category color name (backwards compat) */
+const COLORINDEX_MAP = ['blue', 'yellow', 'green', 'purple', 'pink', 'yellow', 'red'];
 
 let state = {
   user: { name: '', onboarded: false },
@@ -122,9 +124,9 @@ function renderGoalsList(animate = true) {
     btn.addEventListener('click', () => {
       const g = state.goals.find(x => x.id === btn.dataset.id);
       if (!g || g.paused || g.progress >= g.target) return;
-      const r = btn.getBoundingClientRect();
-      const col = GOAL_COLORS[g.colorIndex ?? 0];
-      spawnFloatText(r.left + r.width / 2, r.top, '+1', col.border);
+      const r        = btn.getBoundingClientRect();
+      const accColor = CAT_COLORS[btn.dataset.color] || '#F97316';
+      spawnFloatText(r.left + r.width / 2, r.top, '+1', accColor);
       g.progress++;
       save();
       const willComplete = g.progress >= g.target;
@@ -156,17 +158,12 @@ function renderGoalsList(animate = true) {
 }
 
 function goalCardHTML(g) {
-  const pct = Math.min(100, (g.progress / g.target) * 100);
+  const pct      = Math.min(100, (g.progress / g.target) * 100);
   const complete = g.progress >= g.target;
-  const col = (g.paused || complete) ? null : GOAL_COLORS[g.colorIndex ?? 0];
-  const fillColor = complete ? 'var(--c-green)' : g.paused ? 'var(--c-yellow)' : col.border;
-  const fill = complete ? 100 : visualFill(pct, 5);
-  const cardStyle = complete
-    ? `--fill:${fill}%;--fill-color:${fillColor}`
-    : g.paused
-      ? `--fill:${fill}%;--fill-color:${fillColor};border-left:5px solid var(--c-yellow);background:#FFFBEB;opacity:0.75`
-      : `--fill:${fill}%;--fill-color:${fillColor};border-left:5px solid ${col.border};background:${col.bg}`;
-  const rowClass = complete ? 'is-complete' : g.paused ? 'is-paused' : '';
+  const color    = g.color || COLORINDEX_MAP[g.colorIndex ?? 0] || 'blue';
+  const fill     = complete ? 100 : visualFill(pct, 5);
+  const colorClass = (complete || g.paused) ? '' : `color-${color}`;
+  const rowClass   = complete ? 'is-complete' : g.paused ? 'is-paused' : '';
   return `
     <div class="goal-row ${rowClass}" data-id="${g.id}">
       <div class="goal-swipe-actions">
@@ -179,13 +176,13 @@ function goalCardHTML(g) {
           Supp.
         </button>
       </div>
-      <div class="goal-card ${g.paused ? 'paused' : ''}" style="${cardStyle}">
+      <div class="goal-card ${colorClass} ${g.paused ? 'paused' : ''}" style="--fill:${fill}%">
         <span class="goal-emoji">${g.emoji}</span>
         <div class="goal-info">
           <div class="goal-name">${g.name}${complete ? ' ✓' : ''}</div>
           <div class="goal-prog">${complete ? 'Objectif atteint 🎉' : `${g.progress}/${g.target}${g.paused ? ' · En pause' : ''}`}</div>
         </div>
-        ${(!g.paused && !complete) ? `<button class="goal-action" data-id="${g.id}" style="background:${col.border}">+1</button>` : ''}
+        ${(!g.paused && !complete) ? `<button class="goal-action" data-id="${g.id}" data-color="${color}">+1</button>` : ''}
         ${complete ? `<span class="goal-complete-badge">🏆</span>` : ''}
       </div>
     </div>`;
@@ -716,7 +713,7 @@ document.getElementById('save-goal').addEventListener('click', () => {
     id: uid(),
     name,
     emoji: goalSelectedCat ? goalSelectedCat.emoji : '🎯',
-    colorIndex: state.goals.length % GOAL_COLORS.length,
+    color: goalSelectedCat ? goalSelectedCat.color : 'blue',
     progress: 0,
     target,
   });
