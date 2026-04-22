@@ -28,10 +28,88 @@ const GOAL_COLORS = [
 /* Maps old colorIndex → category color name (backwards compat) */
 const COLORINDEX_MAP = ['blue', 'yellow', 'green', 'purple', 'pink', 'yellow', 'red'];
 
+/* ── CHALLENGE PRESETS ── */
+const CHALLENGE_SUGGESTIONS = {
+  sport:      ['🏃 Courir', '💪 Musculation', '🧘 Yoga', '🚴 Vélo', '🏊 Natation', '🥊 HIIT'],
+  business:   ['📊 Revue daily', '💡 Une idée/jour', '📩 Inbox zero', '🤝 Call client'],
+  meditation: ['🌿 Méditation', '🌬️ Respiration', '🎧 Guidée', '🧘 Body scan'],
+  goals:      ['🎯 Objectif perso', '📝 Journaling', '🌱 Nouvelle habitude'],
+  reading:    ['📖 Lire', '📚 Non-fiction', '📰 Articles', '🧠 Flashcards'],
+  health:     ['💧 Boire 2 L d\'eau', '🥗 Manger sain', '💊 Vitamines', '🚶 Marche'],
+  finance:    ['💰 Épargner', '📈 Investir', '📋 Budget hebdo'],
+  growth:     ['🌱 Apprendre', '🎓 Formation en ligne', '🤝 Réseauter'],
+  sleep:      ['🌙 Coucher avant 23 h', '😴 8 h de sommeil', '📵 No écrans le soir'],
+};
+
+const CATEGORY_SUBTYPES = {
+  sport:      ['Course', 'Musculation', 'Yoga', 'HIIT', 'Natation', 'Vélo', 'Football', 'Tennis', 'Boxe'],
+  meditation: ['Pleine conscience', 'Respiration', 'Guidée', 'Body scan', 'Mantra', 'Visualisation'],
+  reading:    ['Pages/jour', 'Minutes/jour', 'Chapitres/sem.'],
+  sleep:      ['Heure de coucher', 'Durée de sommeil'],
+  health:     ['Hydratation', 'Nutrition', 'Vitamines', 'Marche', 'Étirements'],
+  growth:     ['Compétence', 'Langue', 'Instrument', 'Code', 'Cours en ligne'],
+  business:   ['Stratégie', 'Prospection', 'Contenu', 'Admin'],
+  finance:    ['Épargne', 'Investissement', 'Budget', 'Crypto'],
+};
+
+/* Categories that show a per-session duration picker */
+const HAS_DURATION = new Set(['sport', 'meditation', 'reading', 'health', 'growth']);
+/* Category that shows a bedtime picker */
+const HAS_BEDTIME  = new Set(['sleep']);
+
+/* ── SCOREBOARD ── */
+function computeScore() {
+  const items = [...state.challenges, ...state.goals];
+  if (!items.length) return 0;
+  const sum = items.reduce((s, x) => s + Math.min(1, (x.progress || 0) / (x.target || 1)), 0);
+  return Math.round(sum / items.length * 100);
+}
+
+function generateShareURL() {
+  const payload = {
+    n: state.user.name,
+    s: computeScore(),
+    c: state.challenges.map(c => ({ e: c.emoji, n: c.name, p: c.progress, t: c.target })),
+    g: state.goals.map(g => ({ e: g.emoji, n: g.name, p: g.progress, t: g.target })),
+    d: today(),
+  };
+  return `${location.origin}${location.pathname}?friend=${btoa(unescape(encodeURIComponent(JSON.stringify(payload))))}`;
+}
+
+function parseFriendURL(url) {
+  try {
+    const param = new URL(url).searchParams.get('friend');
+    if (!param) return null;
+    return JSON.parse(decodeURIComponent(escape(atob(param))));
+  } catch { return null; }
+}
+
+function addFriend(data) {
+  if (!state.friends) state.friends = [];
+  const idx = state.friends.findIndex(f => f.n === data.n);
+  if (idx >= 0) state.friends[idx] = data; else state.friends.push(data);
+  save();
+}
+
+function checkShareURL() {
+  const param = new URLSearchParams(location.search).get('friend');
+  if (!param) return;
+  history.replaceState({}, '', location.pathname);
+  try {
+    const data = JSON.parse(decodeURIComponent(escape(atob(param))));
+    if (!data?.n) return;
+    if (confirm(`Ajouter ${data.n} à ton classement ? (Score : ${data.s} %)`)) {
+      addFriend(data);
+      showTab('tab-profile');
+    }
+  } catch {}
+}
+
 let state = {
   user: { name: '', onboarded: false },
   challenges: [],
   goals: [],
+  friends: [],
 };
 
 /* ── STORAGE ── */
@@ -40,7 +118,10 @@ function save() {
 }
 function load() {
   const raw = localStorage.getItem('perfectday');
-  if (raw) state = JSON.parse(raw);
+  if (raw) {
+    state = JSON.parse(raw);
+    if (!state.friends) state.friends = [];
+  }
 }
 
 function today() {
@@ -200,6 +281,14 @@ function renderChallengesHome(animate = true) {
 }
 
 /* ── CHALLENGE CARD ── */
+function buildSubtitle(c) {
+  const parts = [];
+  if (c.subtype)   parts.push(c.subtype);
+  if (c.duration)  parts.push(`${c.duration} min`);
+  if (c.bedtime)   parts.push(`🌙 ${c.bedtime}`);
+  return parts.length ? `<div class="ch-subtitle">${parts.join(' · ')}</div>` : '';
+}
+
 function challengeCardHTML(c) {
   const done     = isDoneToday(c);
   const complete = c.progress >= c.target;
@@ -217,7 +306,8 @@ function challengeCardHTML(c) {
         <div class="ch-avatar">${c.emoji}</div>
         <div class="ch-info">
           <div class="ch-name">${c.name}${complete ? ' ✓' : ''}</div>
-          <div class="ch-prog">${complete ? 'Challenge terminé 🎉' : `${c.progress}/${c.target}`}</div>
+          ${buildSubtitle(c)}
+          <div class="ch-prog">${complete ? 'Challenge terminé 🎉' : `${c.progress}/${c.target} jours`}</div>
         </div>
         ${complete
           ? '<span class="ch-complete-badge">🏆</span>'
@@ -349,29 +439,124 @@ function renderProfile() {
     <div class="stat-box"><div class="stat-num">${done}</div><div class="stat-label">Aujourd'hui</div></div>
     <div class="stat-box"><div class="stat-num">${best}</div><div class="stat-label">Best streak</div></div>
   `;
+  renderScoreboard();
+}
+
+function renderScoreboard() {
+  const myScore = computeScore();
+  document.getElementById('my-score-num').textContent = `${myScore} %`;
+
+  const friends = state.friends || [];
+  const all = [
+    { name: state.user.name || 'Toi', score: myScore, isMe: true,
+      sub: `${state.challenges.length} challenges · ${state.goals.length} goals` },
+    ...friends.map(f => ({
+      name: f.n, score: f.s, isMe: false,
+      sub: `${(f.c||[]).length} challenges · ${(f.g||[]).length} goals · ${f.d || ''}`,
+    })),
+  ].sort((a, b) => b.score - a.score);
+
+  const medals = ['🥇','🥈','🥉'];
+  const el = document.getElementById('leaderboard');
+  if (all.length <= 1) {
+    el.innerHTML = '<div class="no-friends-msg">Partage ton lien pour te comparer à tes amis !</div>';
+    return;
+  }
+  el.innerHTML = all.map((p, i) => `
+    <div class="friend-row ${p.isMe ? 'is-me' : ''}">
+      <span class="friend-rank">${medals[i] || (i + 1)}</span>
+      <div class="friend-detail">
+        <div class="friend-name">${p.name}</div>
+        <div class="friend-sub">${p.sub}</div>
+        <div class="friend-score-bar"><div class="friend-score-fill" style="width:${p.score}%"></div></div>
+      </div>
+      <span class="friend-score">${p.score}%</span>
+    </div>`).join('');
 }
 
 /* ── ADD TAB ── */
 let addSelectedCat = null;
-let addTarget = 365;
+let addTarget      = 365;
+let addSubtype     = '';
+let addDuration    = 20;
 
 function syncPresets(presetsId, val) {
   document.querySelectorAll(`#${presetsId} .preset-btn`).forEach(btn => {
     btn.classList.toggle('active', Number(btn.dataset.days) === val);
   });
 }
+function syncDurPresets(val) {
+  document.querySelectorAll('#dur-presets .preset-btn').forEach(btn => {
+    btn.classList.toggle('active', Number(btn.dataset.mins) === val);
+  });
+}
 
 function renderAddTab() {
   addSelectedCat = null;
-  addTarget = 365;
+  addTarget      = 365;
+  addSubtype     = '';
+  addDuration    = 20;
   document.getElementById('t-val').value = addTarget;
   syncPresets('t-presets', addTarget);
   document.getElementById('new-name').value = '';
   document.getElementById('add-form').classList.add('hidden');
+  document.getElementById('add-suggestions').classList.add('hidden');
+  document.getElementById('add-suggestions').innerHTML = '';
+
   buildCatGrid('add-cat-grid', (cat) => {
     addSelectedCat = cat;
+    addSubtype     = '';
     document.getElementById('new-name').value = cat.name;
     document.getElementById('add-form').classList.remove('hidden');
+
+    /* Suggestions */
+    const sugs = CHALLENGE_SUGGESTIONS[cat.id] || [];
+    const sugWrap = document.getElementById('add-suggestions');
+    if (sugs.length) {
+      sugWrap.innerHTML = sugs.map(s =>
+        `<button class="suggestion-chip">${s}</button>`).join('');
+      sugWrap.classList.remove('hidden');
+      sugWrap.querySelectorAll('.suggestion-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          document.getElementById('new-name').value = chip.textContent;
+        });
+      });
+    } else {
+      sugWrap.classList.add('hidden');
+    }
+
+    /* Sub-types */
+    const subtypes = CATEGORY_SUBTYPES[cat.id] || [];
+    const stWrap   = document.getElementById('add-subtype-wrap');
+    const stChips  = document.getElementById('add-subtype-chips');
+    if (subtypes.length) {
+      stChips.innerHTML = subtypes.map(s =>
+        `<button class="subtype-chip" data-val="${s}">${s}</button>`).join('');
+      stWrap.classList.remove('hidden');
+      stChips.querySelectorAll('.subtype-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          stChips.querySelectorAll('.subtype-chip').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          addSubtype = chip.dataset.val;
+        });
+      });
+    } else {
+      stWrap.classList.add('hidden');
+    }
+
+    /* Duration */
+    const durWrap = document.getElementById('add-duration-wrap');
+    if (HAS_DURATION.has(cat.id)) {
+      document.getElementById('dur-val').value = addDuration;
+      syncDurPresets(addDuration);
+      durWrap.classList.remove('hidden');
+    } else {
+      durWrap.classList.add('hidden');
+    }
+
+    /* Bedtime */
+    const btWrap = document.getElementById('add-bedtime-wrap');
+    HAS_BEDTIME.has(cat.id) ? btWrap.classList.remove('hidden') : btWrap.classList.add('hidden');
   });
 }
 
@@ -618,16 +803,20 @@ document.getElementById('save-challenge').addEventListener('click', () => {
   if (!name || !addSelectedCat) return;
   const tRaw = parseInt(document.getElementById('t-val').value);
   const target = (!isNaN(tRaw) && tRaw >= 1) ? Math.min(3650, tRaw) : addTarget;
+  const durRaw = parseInt(document.getElementById('dur-val').value);
+  const duration = (!isNaN(durRaw) && durRaw >= 1) ? durRaw : addDuration;
+  const bedtime  = document.getElementById('add-bedtime').value || '';
+  const cat = addSelectedCat.id;
   state.challenges.push({
-    id: uid(),
-    name,
+    id: uid(), name,
     emoji: addSelectedCat.emoji,
     color: addSelectedCat.color,
-    category: addSelectedCat.id,
-    progress: 0,
-    target,
-    completions: [],
-    createdAt: today(),
+    category: cat,
+    subtype:  addSubtype || '',
+    duration: HAS_DURATION.has(cat) ? duration : null,
+    bedtime:  HAS_BEDTIME.has(cat)  ? bedtime  : null,
+    progress: 0, target,
+    completions: [], createdAt: today(),
   });
   save();
   showTab('tab-home');
@@ -654,6 +843,28 @@ document.getElementById('t-presets').addEventListener('click', e => {
   addTarget = Number(btn.dataset.days);
   document.getElementById('t-val').value = addTarget;
   syncPresets('t-presets', addTarget);
+});
+document.getElementById('dur-minus').addEventListener('click', () => {
+  addDuration = Math.max(1, addDuration - 5);
+  document.getElementById('dur-val').value = addDuration;
+  syncDurPresets(addDuration);
+});
+document.getElementById('dur-plus').addEventListener('click', () => {
+  addDuration = Math.min(240, addDuration + 5);
+  document.getElementById('dur-val').value = addDuration;
+  syncDurPresets(addDuration);
+});
+document.getElementById('dur-val').addEventListener('input', () => {
+  const v = parseInt(document.getElementById('dur-val').value);
+  if (!isNaN(v) && v >= 1) addDuration = Math.min(240, v);
+  syncDurPresets(addDuration);
+});
+document.getElementById('dur-presets').addEventListener('click', e => {
+  const btn = e.target.closest('.preset-btn');
+  if (!btn) return;
+  addDuration = Number(btn.dataset.mins);
+  document.getElementById('dur-val').value = addDuration;
+  syncDurPresets(addDuration);
 });
 
 /* ── GOAL MODAL ── */
@@ -797,6 +1008,26 @@ document.getElementById('ob-next').addEventListener('click', () => {
   enterApp();
 });
 
+/* ── SCOREBOARD ACTIONS ── */
+document.getElementById('share-score-btn').addEventListener('click', () => {
+  const url = generateShareURL();
+  navigator.clipboard.writeText(url).then(() => {
+    showToast('🔗 Lien copié ! Envoie-le à tes amis.');
+  }).catch(() => {
+    prompt('Copie ce lien :', url);
+  });
+});
+
+document.getElementById('add-friend-btn').addEventListener('click', () => {
+  const url = prompt('Colle le lien de ton ami :');
+  if (!url) return;
+  const data = parseFriendURL(url);
+  if (!data?.n) { showToast('❌ Lien invalide'); return; }
+  addFriend(data);
+  renderScoreboard();
+  showToast(`✅ ${data.n} ajouté au classement !`);
+});
+
 /* ── INIT ── */
 function enterApp() {
   showScreen('app');
@@ -806,6 +1037,7 @@ function enterApp() {
 function init() {
   load();
   buildOnboardingGrid();
+  checkShareURL();
   setTimeout(() => {
     if (state.user.onboarded) {
       enterApp();

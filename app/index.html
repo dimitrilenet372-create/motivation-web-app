@@ -78,10 +78,38 @@
           <h2 class="page-title">Add a challenge</h2>
         </div>
         <div class="cat-grid" id="add-cat-grid"></div>
+        <!-- Suggestions de noms par catégorie -->
+        <div id="add-suggestions" class="suggestions-wrap hidden"></div>
         <div id="add-form" class="add-form hidden">
-          <h3 class="form-label">Name your challenge</h3>
+          <h3 class="form-label">Nom du challenge</h3>
           <input type="text" id="new-name" class="app-input" placeholder="Ex: Méditation"/>
-          <h3 class="form-label">Target days</h3>
+          <!-- Sous-type par catégorie -->
+          <div id="add-subtype-wrap" class="hidden">
+            <h3 class="form-label" id="add-subtype-label">Type</h3>
+            <div class="subtype-chips" id="add-subtype-chips"></div>
+          </div>
+          <!-- Durée par session (méditation, lecture, sport…) -->
+          <div id="add-duration-wrap" class="hidden">
+            <h3 class="form-label" id="add-duration-label">Durée par session</h3>
+            <div class="counter-row">
+              <button type="button" class="counter-btn" id="dur-minus">−</button>
+              <input type="number" class="counter-val" id="dur-val" value="20" min="1" max="240"/>
+              <button type="button" class="counter-btn" id="dur-plus">+</button>
+            </div>
+            <div class="target-presets" id="dur-presets">
+              <button class="preset-btn" data-mins="5">5 min</button>
+              <button class="preset-btn" data-mins="10">10 min</button>
+              <button class="preset-btn" data-mins="20">20 min</button>
+              <button class="preset-btn" data-mins="30">30 min</button>
+              <button class="preset-btn" data-mins="60">1 h</button>
+            </div>
+          </div>
+          <!-- Heure de coucher (sommeil) -->
+          <div id="add-bedtime-wrap" class="hidden">
+            <h3 class="form-label">Heure de coucher cible</h3>
+            <input type="time" id="add-bedtime" class="app-input time-input" value="22:30"/>
+          </div>
+          <h3 class="form-label">Jours cibles</h3>
           <div class="counter-row">
             <button type="button" class="counter-btn" id="t-minus">−</button>
             <input type="number" class="counter-val" id="t-val" value="365" min="1" max="3650"/>
@@ -92,7 +120,7 @@
             <button class="preset-btn" data-days="30">1 mois</button>
             <button class="preset-btn" data-days="365">1 an</button>
           </div>
-          <button class="btn-orange-full" id="save-challenge">Add challenge</button>
+          <button class="btn-orange-full" id="save-challenge">Ajouter le challenge</button>
         </div>
         <div style="height:90px"></div>
       </div>
@@ -132,6 +160,19 @@
           <div class="profile-actions">
             <button class="btn-outline-sm" id="edit-name-btn">Modifier le prénom</button>
             <button class="btn-danger-sm" id="reset-btn">Réinitialiser</button>
+          </div>
+          <!-- SCOREBOARD -->
+          <div class="scoreboard-wrap">
+            <div class="score-header">
+              <div class="score-left">
+                <div class="score-big" id="my-score-num">—</div>
+                <div class="score-caption">Score global</div>
+              </div>
+              <button class="btn-share" id="share-score-btn">📤 Partager mon profil</button>
+            </div>
+            <div class="leaderboard-title">Classement</div>
+            <div id="leaderboard"></div>
+            <button class="btn-add-friend" id="add-friend-btn">+ Ajouter un ami</button>
           </div>
         </div>
       </div>
