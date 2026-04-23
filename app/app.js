@@ -533,6 +533,8 @@ function renderAddTab() {
   document.getElementById('add-suggestions').innerHTML = '';
   document.getElementById('add-duration-wrap').classList.add('hidden');
   document.getElementById('dur-add-btn').classList.add('hidden');
+  document.getElementById('add-bedtime-wrap').classList.add('hidden');
+  document.getElementById('add-subtype-wrap').classList.add('hidden');
 
   buildCatGrid('add-cat-grid', (cat) => {
     addSelectedCat = cat;
