@@ -541,10 +541,11 @@ function renderScoreboard() {
 }
 
 /* ── ADD TAB ── */
-let addSelectedCat = null;
-let addTarget      = 365;
-let addSubtype     = '';
-let addDuration    = 20;
+let addSelectedCat  = null;
+let addTarget       = 365;
+let addSubtype      = '';
+let addDuration     = 20;
+let editChallengeId = null;
 
 function syncPresets(presetsId, val) {
   document.querySelectorAll(`#${presetsId} .preset-btn`).forEach(btn => {
@@ -568,6 +569,8 @@ function hideDurPicker() {
 }
 
 function renderAddTab() {
+  editChallengeId = null;
+  document.getElementById('save-challenge').textContent = 'Ajouter le challenge';
   addSelectedCat = null;
   addTarget      = 365;
   addSubtype     = '';
@@ -849,6 +852,43 @@ function cancelTimerInCard() {
   renderChallengesHome(false);
 }
 
+/* ── EDIT CHALLENGE ── */
+function openEditChallenge(c) {
+  editChallengeId = c.id;
+  showTab('tab-add'); /* calls renderAddTab which resets form */
+
+  /* Pre-select category */
+  const catEl = document.querySelector(`#add-cat-grid .cat-item[data-id="${c.category}"]`);
+  if (catEl) catEl.click();
+
+  /* Override name (catEl.click sets it to cat.name) */
+  document.getElementById('new-name').value = c.name;
+
+  /* Pre-select subtype chip */
+  if (c.subtype) {
+    const chip = document.querySelector(`#add-subtype-chips .subtype-chip[data-val="${c.subtype}"]`);
+    if (chip) chip.click();
+  }
+
+  /* Pre-fill duration */
+  if (c.duration) {
+    addDuration = c.duration;
+    document.getElementById('dur-val').value = c.duration;
+    syncDurPresets(c.duration);
+  }
+
+  /* Pre-fill bedtime */
+  if (c.bedtime) document.getElementById('add-bedtime').value = c.bedtime;
+
+  /* Pre-fill target */
+  addTarget = c.target;
+  document.getElementById('t-val').value = c.target;
+  syncPresets('t-presets', c.target);
+
+  /* Change button label */
+  document.getElementById('save-challenge').textContent = 'Sauvegarder';
+}
+
 /* ── GOAL SWIPE ── */
 const SWIPE_W = 130;
 
@@ -966,8 +1006,11 @@ function initChallengeSwipe(container) {
 
     card.addEventListener('click', e => {
       if (row._wasTouched) { row._wasTouched = false; return; }
-      if (e.target.closest('.ch-action')) return;
-      row._swiped ? closeChallengeSwipe(row) : openChallengeSwipe(row);
+      if (e.target.closest('.ch-action') || e.target.closest('.ch-timer-btns')) return;
+      if (card.classList.contains('timer-active')) return;
+      if (row._swiped) { closeChallengeSwipe(row); return; }
+      const c = state.challenges.find(x => x.id === row.dataset.id);
+      if (c) openEditChallenge(c);
     });
   });
 }
@@ -1005,23 +1048,39 @@ document.addEventListener('click', e => {
 document.getElementById('save-challenge').addEventListener('click', () => {
   const name = document.getElementById('new-name').value.trim();
   if (!name || !addSelectedCat) return;
-  const tRaw = parseInt(document.getElementById('t-val').value);
-  const target = (!isNaN(tRaw) && tRaw >= 1) ? Math.min(3650, tRaw) : addTarget;
-  const durRaw = parseInt(document.getElementById('dur-val').value);
+  const tRaw    = parseInt(document.getElementById('t-val').value);
+  const target  = (!isNaN(tRaw) && tRaw >= 1) ? Math.min(3650, tRaw) : addTarget;
+  const durRaw  = parseInt(document.getElementById('dur-val').value);
   const duration = (!isNaN(durRaw) && durRaw >= 1) ? durRaw : addDuration;
   const bedtime  = document.getElementById('add-bedtime').value || '';
-  const cat = addSelectedCat.id;
-  state.challenges.push({
-    id: uid(), name,
-    emoji: addSelectedCat.emoji,
-    color: addSelectedCat.color,
-    category: cat,
-    subtype:  addSubtype || '',
-    duration: HAS_DURATION.has(cat) ? duration : null,
-    bedtime:  HAS_BEDTIME.has(cat)  ? bedtime  : null,
-    progress: 0, target,
-    completions: [], createdAt: today(),
-  });
+  const cat      = addSelectedCat.id;
+
+  if (editChallengeId) {
+    const c = state.challenges.find(x => x.id === editChallengeId);
+    if (c) {
+      c.name     = name;
+      c.emoji    = addSelectedCat.emoji;
+      c.color    = addSelectedCat.color;
+      c.category = cat;
+      c.subtype  = addSubtype || '';
+      c.duration = HAS_DURATION.has(cat) ? duration : null;
+      c.bedtime  = HAS_BEDTIME.has(cat)  ? bedtime  : null;
+      c.target   = target;
+    }
+    editChallengeId = null;
+  } else {
+    state.challenges.push({
+      id: uid(), name,
+      emoji: addSelectedCat.emoji,
+      color: addSelectedCat.color,
+      category: cat,
+      subtype:  addSubtype || '',
+      duration: HAS_DURATION.has(cat) ? duration : null,
+      bedtime:  HAS_BEDTIME.has(cat)  ? bedtime  : null,
+      progress: 0, target,
+      completions: [], createdAt: today(),
+    });
+  }
   save();
   showTab('tab-home');
 });
