@@ -682,7 +682,7 @@ body {
 .progress-bar-fill {
   height: 100%; border-radius: 6px;
   background: linear-gradient(90deg, var(--orange) 0%, var(--amber) 100%);
-  transition: width 0.6s ease;
+  transition: width 0.7s cubic-bezier(0.34, 1.2, 0.64, 1);
 }
 .tracking-stats {
   display: grid; grid-template-columns: 1fr 1fr 1fr;
@@ -780,7 +780,7 @@ body {
   width: 100%; height: 4px; background: var(--gray-l);
   border-radius: 2px; margin-top: 4px; overflow: hidden;
 }
-.friend-score-fill { height: 100%; background: var(--orange); border-radius: 2px; }
+.friend-score-fill { height: 100%; background: var(--orange); border-radius: 2px; transition: width 0.7s cubic-bezier(0.34, 1.2, 0.64, 1); }
 .friend-detail { flex: 1; }
 .friend-sub { font-size: 11px; color: var(--gray); margin-top: 2px; }
 .no-friends-msg {
@@ -1016,3 +1016,94 @@ body {
 /* ── LISTS ── */
 #all-challenges-list,
 #tracking-list { padding: 0 20px; }
+
+/* ══════════════════════════════════════════
+   TIMER OVERLAY
+══════════════════════════════════════════ */
+.timer-overlay {
+  position: fixed; inset: 0;
+  background: rgba(15,12,8,.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 700;
+}
+
+.timer-card {
+  position: relative;
+  background: var(--bg);
+  border-radius: 28px;
+  padding: 28px 24px 24px;
+  width: calc(100% - 48px);
+  max-width: 340px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 18px;
+  box-shadow: 0 32px 64px rgba(0,0,0,.28);
+  animation: timerCardIn .32s cubic-bezier(.34,1.4,.64,1) both;
+}
+@keyframes timerCardIn {
+  from { transform: scale(.84) translateY(24px); opacity: 0; }
+  to   { transform: scale(1)   translateY(0);    opacity: 1; }
+}
+
+.timer-x {
+  position: absolute; top: 14px; right: 14px;
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--gray-l); border: none;
+  font-size: 13px; font-weight: 700; color: var(--gray);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background .15s;
+}
+.timer-x:hover { background: var(--border); }
+
+.timer-emoji-big      { font-size: 40px; line-height: 1; }
+.timer-challenge-name {
+  font-size: 18px; font-weight: 700; color: var(--dark);
+  text-align: center; padding: 0 28px;
+}
+
+.timer-ring-wrap {
+  position: relative;
+  width: 200px; height: 200px;
+  display: flex; align-items: center; justify-content: center;
+}
+.timer-svg {
+  position: absolute; inset: 0;
+  width: 200px; height: 200px;
+  transform: rotate(-90deg);
+}
+.timer-ring-bg {
+  fill: none;
+  stroke: var(--gray-l);
+  stroke-width: 13;
+}
+.timer-ring-fill {
+  fill: none;
+  stroke: var(--orange);
+  stroke-width: 13;
+  stroke-linecap: round;
+  stroke-dasharray: 502.65;
+  stroke-dashoffset: 502.65;
+}
+.timer-countdown {
+  font-size: 48px; font-weight: 800; letter-spacing: -2px;
+  color: var(--dark);
+  font-variant-numeric: tabular-nums;
+  position: relative; z-index: 1;
+}
+
+.timer-row {
+  display: flex; gap: 10px; width: 100%;
+}
+.timer-btn-secondary,
+.timer-btn-primary {
+  flex: 1; padding: 13px 8px;
+  border-radius: 16px; border: none;
+  font-family: var(--font-sans); font-size: 14px; font-weight: 700;
+  cursor: pointer;
+  transition: opacity .15s, transform .12s;
+}
+.timer-btn-secondary:active,
+.timer-btn-primary:active  { transform: scale(.96); }
+.timer-btn-secondary { background: var(--gray-l); color: var(--dark); }
+.timer-btn-primary   { background: var(--dark);   color: white; }

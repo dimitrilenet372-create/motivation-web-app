@@ -222,6 +222,7 @@ function renderGoalsList(animate = true) {
     return;
   }
   el.innerHTML = state.goals.map(g => goalCardHTML(g)).join('');
+  animateFills(el);
   if (animate) addEntryStagger(el, '.goal-row');
   el.querySelectorAll('.goal-action').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -279,7 +280,7 @@ function goalCardHTML(g) {
           Supp.
         </button>
       </div>
-      <div class="goal-card ${colorClass} ${g.paused ? 'paused' : ''}" style="--fill:${fill}%">
+      <div class="goal-card ${colorClass} ${g.paused ? 'paused' : ''}" style="--fill:0%" data-fill="${fill}%">
         <span class="goal-emoji">${g.emoji}</span>
         <div class="goal-info">
           <div class="goal-name">${g.name}${complete ? ' ✓' : ''}</div>
@@ -298,6 +299,7 @@ function renderChallengesHome(animate = true) {
     return;
   }
   el.innerHTML = state.challenges.slice(0, 5).map(c => challengeCardHTML(c)).join('');
+  animateFills(el);
   if (animate) addEntryStagger(el, '.challenge-row');
   bindChallengeActions(el);
 }
@@ -324,7 +326,7 @@ function challengeCardHTML(c) {
           <span class="ch-del-icon">✕</span>Supp.
         </button>
       </div>
-      <div class="challenge-card ${colorClass}" style="--fill:${fill}%">
+      <div class="challenge-card ${colorClass}" style="--fill:0%" data-fill="${fill}%">
         <div class="ch-avatar">${c.emoji}</div>
         <div class="ch-info">
           <div class="ch-name">${c.name}${complete ? ' ✓' : ''}</div>
@@ -340,34 +342,38 @@ function challengeCardHTML(c) {
 
 const CAT_COLORS = { blue:'#2563EB', green:'#16A34A', red:'#DC2626', yellow:'#CA8A04', purple:'#7C3AED', pink:'#DB2777' };
 
+function completeChallengeToday(c) {
+  if (!c.completions) c.completions = [];
+  c.completions.push(today());
+  c.progress = Math.min(c.progress + 1, c.target);
+  save();
+  const willComplete = c.progress >= c.target;
+  const col = CAT_COLORS[c.color] || '#F97316';
+  const cx = window.innerWidth / 2;
+  const cy = window.innerHeight * 0.38;
+  const activeTabId = document.querySelector('.tab.active').id;
+  if (activeTabId === 'tab-home') {
+    renderChallengesHome(false);
+    renderGoalsList(false);
+  }
+  const activeTab = document.querySelector('.tab.active');
+  const newChCard = activeTab.querySelector(`.challenge-row[data-id="${c.id}"] .challenge-card`);
+  addShine(newChCard);
+  if (willComplete) {
+    pulseRing(newChCard, `${col}88`);
+    spawnConfetti(cx, cy);
+    showToast(`🏆 ${c.name} — challenge terminé !`);
+  } else {
+    spawnFloatText(cx, cy, '+1', col);
+  }
+}
+
 function bindChallengeActions(container) {
   container.querySelectorAll('.ch-action').forEach(btn => {
     btn.addEventListener('click', () => {
       const c = state.challenges.find(x => x.id === btn.dataset.id);
       if (!c || isDoneToday(c) || c.progress >= c.target) return;
-      const r   = btn.getBoundingClientRect();
-      const col = CAT_COLORS[c.color] || '#F97316';
-      spawnFloatText(r.left + r.width / 2, r.top, '+1', col);
-      if (!c.completions) c.completions = [];
-      c.completions.push(today());
-      c.progress = Math.min(c.progress + 1, c.target);
-      save();
-      const willComplete = c.progress >= c.target;
-      const cid = c.id;
-      const activeTabId = document.querySelector('.tab.active').id;
-      /* Re-render without stagger so other cards don't dance on each tap */
-      if (activeTabId === 'tab-home') {
-        renderChallengesHome(false);
-        renderGoalsList(false);
-      }
-      const activeTab = document.querySelector('.tab.active');
-      const newChCard = activeTab.querySelector(`.challenge-row[data-id="${cid}"] .challenge-card`);
-      addShine(newChCard);
-      if (willComplete) {
-        pulseRing(newChCard, `${col}88`);
-        spawnConfetti(r.left + r.width / 2, r.top + r.height / 2);
-        showToast(`🏆 ${c.name} — challenge terminé !`);
-      }
+      openTimer(c);
     });
   });
   container.querySelectorAll('.ch-del-btn').forEach(btn => {
@@ -389,6 +395,7 @@ function renderAllChallenges(animate = true) {
     return;
   }
   el.innerHTML = state.challenges.map(c => challengeCardHTML(c)).join('');
+  animateFills(el);
   if (animate) addEntryStagger(el, '.challenge-row');
   bindChallengeActions(el);
 }
@@ -401,7 +408,7 @@ function renderTracking() {
     return;
   }
   el.innerHTML = state.challenges.map(c => {
-    const pct    = Math.min(100, (c.progress / c.target) * 100).toFixed(1);
+    const pct = Math.min(100, (c.progress / c.target) * 100).toFixed(1);
     const streak = getStreak(c);
     return `
       <div class="tracking-card">
@@ -412,7 +419,7 @@ function renderTracking() {
         </div>
         <div class="tracking-body">
           <div class="progress-bar-big">
-            <div class="progress-bar-fill" style="width:${pct}%"></div>
+            <div class="progress-bar-fill" style="width:0%" data-fill="${pct}%"></div>
           </div>
           <div class="tracking-stats">
             <div class="tracking-stat">
@@ -431,6 +438,7 @@ function renderTracking() {
         </div>
       </div>`;
   }).join('');
+  animateFills(el);
 }
 
 function getStreak(c) {
@@ -487,10 +495,11 @@ function renderScoreboard() {
       <div class="friend-detail">
         <div class="friend-name">${p.name}</div>
         <div class="friend-sub">${p.sub}</div>
-        <div class="friend-score-bar"><div class="friend-score-fill" style="width:${p.score}%"></div></div>
+        <div class="friend-score-bar"><div class="friend-score-fill" style="width:0%" data-fill="${p.score}%"></div></div>
       </div>
       <span class="friend-score">${p.score}%</span>
     </div>`).join('');
+  animateFills(el);
 }
 
 /* ── ADD TAB ── */
@@ -686,6 +695,93 @@ function addShine(el) {
   el.classList.add('anim-shine');
   setTimeout(() => el.classList.remove('anim-shine'), 700);
 }
+
+function animateFills(container) {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      container.querySelectorAll('[data-fill]').forEach(el => {
+        const val = el.dataset.fill;
+        if (el.classList.contains('progress-bar-fill') || el.classList.contains('friend-score-fill')) {
+          el.style.width = val;
+        } else {
+          el.style.setProperty('--fill', val);
+        }
+      });
+    });
+  });
+}
+
+/* ── TIMER ── */
+const timerState = {
+  cid: null, totalMs: 0, startTs: 0,
+  elapsed: 0, paused: false, pausedAt: 0, raf: null,
+};
+const RING_C = 502.65; /* circumference for r=80 */
+
+function openTimer(c) {
+  const mins = c.duration || 20;
+  timerState.cid     = c.id;
+  timerState.totalMs = mins * 60 * 1000;
+  timerState.elapsed = 0;
+  timerState.paused  = false;
+  timerState.startTs = performance.now();
+
+  document.getElementById('timer-emoji').textContent = c.emoji;
+  document.getElementById('timer-name').textContent  = c.name;
+  const fill = document.getElementById('timer-ring-fill');
+  fill.style.stroke          = CAT_COLORS[c.color] || '#F97316';
+  fill.style.strokeDashoffset = RING_C;
+  document.getElementById('timer-display').textContent = fmtTime(mins * 60);
+  document.getElementById('timer-pause').textContent   = '⏸ Pause';
+  document.getElementById('timer-overlay').classList.remove('hidden');
+  timerState.raf = requestAnimationFrame(tickTimer);
+}
+
+function tickTimer(ts) {
+  if (timerState.paused) return;
+  timerState.elapsed  = ts - timerState.startTs;
+  const progress      = Math.min(1, timerState.elapsed / timerState.totalMs);
+  const remaining     = Math.max(0, timerState.totalMs - timerState.elapsed);
+  document.getElementById('timer-ring-fill').style.strokeDashoffset = RING_C * (1 - progress);
+  document.getElementById('timer-display').textContent = fmtTime(remaining / 1000);
+  if (progress >= 1) { finishTimer(); return; }
+  timerState.raf = requestAnimationFrame(tickTimer);
+}
+
+function fmtTime(totalSeconds) {
+  const s = Math.ceil(totalSeconds);
+  const m = Math.floor(s / 60);
+  return `${String(m).padStart(2,'0')}:${String(s % 60).padStart(2,'0')}`;
+}
+
+function finishTimer() {
+  cancelAnimationFrame(timerState.raf);
+  document.getElementById('timer-overlay').classList.add('hidden');
+  const c = state.challenges.find(x => x.id === timerState.cid);
+  if (c && !isDoneToday(c) && c.progress < c.target) completeChallengeToday(c);
+}
+
+document.getElementById('timer-cancel').addEventListener('click', () => {
+  cancelAnimationFrame(timerState.raf);
+  document.getElementById('timer-overlay').classList.add('hidden');
+});
+
+document.getElementById('timer-pause').addEventListener('click', () => {
+  const btn = document.getElementById('timer-pause');
+  if (timerState.paused) {
+    timerState.startTs += performance.now() - timerState.pausedAt;
+    timerState.paused   = false;
+    btn.textContent     = '⏸ Pause';
+    timerState.raf      = requestAnimationFrame(tickTimer);
+  } else {
+    timerState.paused  = true;
+    timerState.pausedAt = performance.now();
+    cancelAnimationFrame(timerState.raf);
+    btn.textContent = '▶ Reprendre';
+  }
+});
+
+document.getElementById('timer-done').addEventListener('click', finishTimer);
 
 /* ── GOAL SWIPE ── */
 const SWIPE_W = 130;
