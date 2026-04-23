@@ -126,6 +126,28 @@
       </div>
     </div>
 
+    <!-- SCORES TAB -->
+    <div id="tab-scores" class="tab">
+      <div class="app-scroll">
+        <div class="add-header">
+          <h2 class="page-title">Scoreboard</h2>
+        </div>
+        <div class="scoreboard-wrap">
+          <div class="score-header">
+            <div class="score-left">
+              <div class="score-big" id="my-score-num">—</div>
+              <div class="score-caption">Score global</div>
+            </div>
+            <button class="btn-share" id="share-score-btn">📤 Partager</button>
+          </div>
+          <div class="leaderboard-title">Classement</div>
+          <div id="leaderboard"></div>
+          <button class="btn-add-friend" id="add-friend-btn">+ Ajouter un ami</button>
+        </div>
+        <div style="height:90px"></div>
+      </div>
+    </div>
+
     <!-- TRACKING TAB -->
     <div id="tab-tracking" class="tab">
       <div class="app-scroll">
@@ -150,18 +172,6 @@
             <button class="btn-outline-sm" id="edit-name-btn">Modifier le prénom</button>
             <button class="btn-danger-sm" id="reset-btn">Réinitialiser</button>
           </div>
-          <div class="scoreboard-wrap">
-            <div class="score-header">
-              <div class="score-left">
-                <div class="score-big" id="my-score-num">—</div>
-                <div class="score-caption">Score global</div>
-              </div>
-              <button class="btn-share" id="share-score-btn">📤 Partager</button>
-            </div>
-            <div class="leaderboard-title">Classement</div>
-            <div id="leaderboard"></div>
-            <button class="btn-add-friend" id="add-friend-btn">+ Ajouter un ami</button>
-          </div>
         </div>
       </div>
     </div>
@@ -172,9 +182,9 @@
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         <span>Home</span>
       </button>
-      <button class="nav-btn" data-tab="tab-add">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-        <span>Add</span>
+      <button class="nav-btn" data-tab="tab-scores">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 0 0 5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 1 0 5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>
+        <span>Scores</span>
       </button>
       <div class="nav-fab-slot">
         <button class="nav-fab" id="nav-fab">

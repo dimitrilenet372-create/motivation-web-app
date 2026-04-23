@@ -122,7 +122,7 @@ function checkShareURL() {
     if (!data?.n) return;
     if (confirm(`Ajouter ${data.n} à ton classement ? (Score : ${data.s} %)`)) {
       addFriend(data);
-      showTab('tab-profile');
+      showTab('tab-scores');
     }
   } catch {}
 }
@@ -182,6 +182,7 @@ function showTab(id) {
 
 function renderCurrentTab(id, animate = true) {
   if (id === 'tab-home')     renderHome(animate);
+  if (id === 'tab-scores')   renderScoreboard();
   if (id === 'tab-tracking') renderTracking();
   if (id === 'tab-profile')  renderProfile();
   if (id === 'tab-add')      renderAddTab();
@@ -458,7 +459,6 @@ function renderProfile() {
     <div class="stat-box"><div class="stat-num">${done}</div><div class="stat-label">Aujourd'hui</div></div>
     <div class="stat-box"><div class="stat-num">${best}</div><div class="stat-label">Best streak</div></div>
   `;
-  renderScoreboard();
 }
 
 function renderScoreboard() {
