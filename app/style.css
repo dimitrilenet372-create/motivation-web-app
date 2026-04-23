@@ -95,18 +95,14 @@ body {
     z-index: -1;
   }
 
-  /* Sur desktop, la nav est dans le cadre (position absolute sur #app) */
+  /* Sur desktop : pill ancré dans le cadre (position absolute sur #app) */
   .bottom-nav {
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: 0 0 50px 50px;
-  }
-
-  /* Le FAB sort au-dessus de la nav mais reste dans le cadre */
-  .nav-fab {
-    top: -28px;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    width: auto;
+    transform: none;
   }
 }
 
@@ -828,26 +824,28 @@ body {
 /* Time input */
 .time-input { font-size: 22px !important; text-align: center; letter-spacing: 2px; }
 
-/* ── BOTTOM NAV ── */
+/* ── BOTTOM NAV — pill flottant ── */
 .bottom-nav {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 72px;
-  padding-bottom: env(safe-area-inset-bottom);
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: 430px;
+  height: 64px;
   background: #fff;
-  box-shadow: 0 -1px 0 rgba(0,0,0,0.07);
+  border-radius: 36px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
   display: flex;
-  align-items: flex-start;
-  padding-top: 10px;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 6px;
   z-index: 100;
   overflow: visible;
-  flex-shrink: 0;
 }
 .nav-btn {
   flex: 1; background: none; border: none;
-  padding: 4px 2px; cursor: pointer;
+  padding: 6px 2px; cursor: pointer;
   display: flex; flex-direction: column; align-items: center; gap: 3px;
   color: #B0B0B0;
   font-family: var(--font-sans); font-size: 10px; font-weight: 600;
@@ -856,21 +854,20 @@ body {
 .nav-btn.active { color: var(--dark); }
 .nav-btn:active { transform: scale(0.92); }
 
-/* FAB slot — espace pour le bouton central */
+/* FAB slot */
 .nav-fab-slot {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-/* Le FAB est positionné par rapport au .bottom-nav (position:fixed = containing block) */
 .nav-fab {
   position: absolute;
-  top: -28px;
+  top: -22px;
   left: 50%;
   transform: translateX(-50%);
-  width: 58px;
-  height: 58px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   background: var(--orange);
   border: none;
