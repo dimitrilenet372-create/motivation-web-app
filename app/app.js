@@ -302,6 +302,10 @@ function renderChallengesHome(animate = true) {
   animateFills(el);
   if (animate) addEntryStagger(el, '.challenge-row');
   bindChallengeActions(el);
+  if (timerState.cid) {
+    const ac = state.challenges.find(x => x.id === timerState.cid);
+    if (ac) applyTimerToCard(ac);
+  }
 }
 
 /* ── CHALLENGE CARD ── */
@@ -711,12 +715,11 @@ function animateFills(container) {
   });
 }
 
-/* ── TIMER ── */
+/* ── TIMER (in-card) ── */
 const timerState = {
   cid: null, totalMs: 0, startTs: 0,
-  elapsed: 0, paused: false, pausedAt: 0, raf: null,
+  elapsed: 0, paused: false, pausedAt: 0, raf: null, cardEl: null,
 };
-const RING_C = 502.65; /* circumference for r=80 */
 
 function openTimer(c) {
   const mins = c.duration || 20;
@@ -725,63 +728,92 @@ function openTimer(c) {
   timerState.elapsed = 0;
   timerState.paused  = false;
   timerState.startTs = performance.now();
-
-  document.getElementById('timer-emoji').textContent = c.emoji;
-  document.getElementById('timer-name').textContent  = c.name;
-  const fill = document.getElementById('timer-ring-fill');
-  fill.style.stroke          = CAT_COLORS[c.color] || '#F97316';
-  fill.style.strokeDashoffset = RING_C;
-  document.getElementById('timer-display').textContent = fmtTime(mins * 60);
-  document.getElementById('timer-pause').textContent   = '⏸ Pause';
-  document.getElementById('timer-overlay').classList.remove('hidden');
+  applyTimerToCard(c);
   timerState.raf = requestAnimationFrame(tickTimer);
+}
+
+function applyTimerToCard(c) {
+  const card = document.querySelector(`.challenge-row[data-id="${c.id}"] .challenge-card`);
+  if (!card) return;
+  timerState.cardEl = card;
+  card.classList.add('timer-active');
+  card.style.setProperty('--fill', '0%');
+  const remaining = (timerState.totalMs - timerState.elapsed) / 1000;
+  card.innerHTML = `
+    <div class="ch-avatar">${c.emoji}</div>
+    <div class="ch-info">
+      <div class="ch-name">${c.name}</div>
+      <div class="ch-timer-cd">${fmtTime(remaining)}</div>
+    </div>
+    <div class="ch-timer-btns">
+      <button class="ch-tb-cancel">✕</button>
+      <button class="ch-tb-pause">⏸</button>
+      <button class="ch-tb-done">✓</button>
+    </div>`;
+  card.querySelector('.ch-tb-cancel').addEventListener('click', cancelTimerInCard);
+  card.querySelector('.ch-tb-pause').addEventListener('click', pauseResumeTimer);
+  card.querySelector('.ch-tb-done').addEventListener('click', () => finishTimer(true));
 }
 
 function tickTimer(ts) {
   if (timerState.paused) return;
-  timerState.elapsed  = ts - timerState.startTs;
-  const progress      = Math.min(1, timerState.elapsed / timerState.totalMs);
-  const remaining     = Math.max(0, timerState.totalMs - timerState.elapsed);
-  document.getElementById('timer-ring-fill').style.strokeDashoffset = RING_C * (1 - progress);
-  document.getElementById('timer-display').textContent = fmtTime(remaining / 1000);
-  if (progress >= 1) { finishTimer(); return; }
+  timerState.elapsed   = ts - timerState.startTs;
+  const progress       = Math.min(1, timerState.elapsed / timerState.totalMs);
+  const remaining      = Math.max(0, timerState.totalMs - timerState.elapsed);
+  const card           = timerState.cardEl;
+
+  if (card && card.isConnected) {
+    card.style.setProperty('--fill', `${(progress * 100).toFixed(2)}%`);
+    const cd = card.querySelector('.ch-timer-cd');
+    if (cd) cd.textContent = fmtTime(remaining / 1000);
+  } else if (timerState.cid) {
+    const c = state.challenges.find(x => x.id === timerState.cid);
+    if (c) applyTimerToCard(c);
+  }
+
+  if (progress >= 1) { finishTimer(true); return; }
   timerState.raf = requestAnimationFrame(tickTimer);
 }
 
 function fmtTime(totalSeconds) {
   const s = Math.ceil(totalSeconds);
   const m = Math.floor(s / 60);
-  return `${String(m).padStart(2,'0')}:${String(s % 60).padStart(2,'0')}`;
+  return `${String(m).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
 }
 
-function finishTimer() {
-  cancelAnimationFrame(timerState.raf);
-  document.getElementById('timer-overlay').classList.add('hidden');
-  const c = state.challenges.find(x => x.id === timerState.cid);
-  if (c && !isDoneToday(c) && c.progress < c.target) completeChallengeToday(c);
-}
-
-document.getElementById('timer-cancel').addEventListener('click', () => {
-  cancelAnimationFrame(timerState.raf);
-  document.getElementById('timer-overlay').classList.add('hidden');
-});
-
-document.getElementById('timer-pause').addEventListener('click', () => {
-  const btn = document.getElementById('timer-pause');
+function pauseResumeTimer() {
+  const btn = timerState.cardEl?.querySelector('.ch-tb-pause');
   if (timerState.paused) {
     timerState.startTs += performance.now() - timerState.pausedAt;
     timerState.paused   = false;
-    btn.textContent     = '⏸ Pause';
-    timerState.raf      = requestAnimationFrame(tickTimer);
+    if (btn) btn.textContent = '⏸';
+    timerState.raf = requestAnimationFrame(tickTimer);
   } else {
-    timerState.paused  = true;
+    timerState.paused   = true;
     timerState.pausedAt = performance.now();
     cancelAnimationFrame(timerState.raf);
-    btn.textContent = '▶ Reprendre';
+    if (btn) btn.textContent = '▶';
   }
-});
+}
 
-document.getElementById('timer-done').addEventListener('click', finishTimer);
+function finishTimer(success = true) {
+  cancelAnimationFrame(timerState.raf);
+  const cid = timerState.cid;
+  timerState.cid = null; timerState.cardEl = null;
+  const c = state.challenges.find(x => x.id === cid);
+  if (!c) return;
+  if (success && !isDoneToday(c) && c.progress < c.target) {
+    completeChallengeToday(c);
+  } else {
+    renderChallengesHome(false);
+  }
+}
+
+function cancelTimerInCard() {
+  cancelAnimationFrame(timerState.raf);
+  timerState.cid = null; timerState.cardEl = null;
+  renderChallengesHome(false);
+}
 
 /* ── GOAL SWIPE ── */
 const SWIPE_W = 130;
@@ -872,6 +904,7 @@ function initChallengeSwipe(container) {
     let startX = 0, startY = 0, tracking = false;
 
     card.addEventListener('touchstart', e => {
+      if (card.classList.contains('timer-active')) return;
       startX = e.touches[0].clientX;
       startY = e.touches[0].clientY;
       tracking = true;
@@ -880,7 +913,7 @@ function initChallengeSwipe(container) {
     }, { passive: true });
 
     card.addEventListener('touchmove', e => {
-      if (!tracking) return;
+      if (!tracking || card.classList.contains('timer-active')) return;
       const dx = e.touches[0].clientX - startX;
       const dy = e.touches[0].clientY - startY;
       if (!row._swiped && Math.abs(dy) > Math.abs(dx) + 4) { tracking = false; return; }
