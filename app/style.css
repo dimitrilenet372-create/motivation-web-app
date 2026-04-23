@@ -264,12 +264,13 @@ body {
 ══════════════════════════════════════════ */
 #app {
   display: flex;
-  flex: 1;
   flex-direction: column;
   background: var(--bg-off);
   position: relative;
   overflow: hidden;
-  min-height: 0;
+  /* #app EST le .screen — pas de flex:1 pour ne pas déborder du cadre */
+  width: 100%;
+  height: 100%;
 }
 .tab {
   display: none; flex: 1; min-height: 0; flex-direction: column;

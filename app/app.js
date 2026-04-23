@@ -577,15 +577,15 @@ function renderAddTab() {
       stWrap.classList.add('hidden');
     }
 
-    /* 3. Durée : optionnelle, affichée via bouton pour les catégories compatibles */
+    /* 3. Durée : visible pour les catégories compatibles */
     addDuration = 20;
     document.getElementById('dur-val').value = addDuration;
     syncDurPresets(addDuration);
-    document.getElementById('add-duration-wrap').classList.add('hidden');
+    document.getElementById('dur-add-btn').classList.add('hidden');
     if (HAS_DURATION.has(cat.id)) {
-      document.getElementById('dur-add-btn').classList.remove('hidden');
+      document.getElementById('add-duration-wrap').classList.remove('hidden');
     } else {
-      document.getElementById('dur-add-btn').classList.add('hidden');
+      document.getElementById('add-duration-wrap').classList.add('hidden');
     }
 
     /* 4. Heure de coucher — UNIQUEMENT catégorie sleep */
