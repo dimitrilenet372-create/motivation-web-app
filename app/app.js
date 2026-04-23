@@ -14,9 +14,12 @@ const CATEGORIES = [
   { id: 'sleep',      name: 'Sommeil',    emoji: '😴', color: 'blue'   },
 ];
 
-const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const DAY_SHORT   = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-let calWeekOffset = 0;
+const MONTH_NAMES  = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAY_SHORT    = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const DAY_FULL_FR  = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+const MONTH_FR     = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+let calWeekOffset  = 0;
+let selectedDay    = null; /* set to today() after load */
 
 const GOAL_COLORS = [
   { border: '#F97316', bg: '#FFF7ED' }, // orange
@@ -225,25 +228,66 @@ function renderWeekStrip() {
     const isToday = dStr === todayStr;
     const isPast  = dStr < todayStr;
     const hasDone = doneDates.has(dStr);
+    const isSel   = dStr === (selectedDay || todayStr);
 
     const col = document.createElement('div');
-    col.className = `day-col${isToday ? ' today' : isPast ? ' past' : ' future'}`;
+    col.className = `day-col${isToday ? ' today' : isPast ? ' past' : ' future'}${isSel ? ' selected' : ''}`;
     col.innerHTML = `
       <span class="day-col-name">${DAY_SHORT[i]}</span>
       <div class="day-col-num-wrap"><span class="day-col-num">${d.getDate()}</span></div>
       <div class="day-dot${hasDone ? ' done' : ''}"></div>`;
+    col.addEventListener('click', () => {
+      selectedDay = dStr;
+      renderWeekStrip();
+      renderDaySummary();
+    });
     strip.appendChild(col);
   }
 }
 
+function renderDaySummary() {
+  const el = document.getElementById('day-summary');
+  if (!el) return;
+  const sel = selectedDay || today();
+
+  if (sel === today()) { el.innerHTML = ''; return; }
+
+  if (sel > today()) {
+    el.innerHTML = `<div class="day-summary-card"><div class="ds-empty">Aucune donnée pour ce jour</div></div>`;
+    return;
+  }
+
+  const d      = new Date(sel + 'T00:00:00');
+  const label  = `${DAY_FULL_FR[d.getDay()]} ${d.getDate()} ${MONTH_FR[d.getMonth()]}`;
+  const done   = state.challenges.filter(c => (c.completions || []).includes(sel));
+  const missed = state.challenges.filter(c => !(c.completions || []).includes(sel));
+
+  el.innerHTML = `
+    <div class="day-summary-card">
+      <div class="ds-hdr">
+        <span class="ds-date">${label}</span>
+        <span class="ds-score">${done.length} / ${state.challenges.length}</span>
+      </div>
+      <div class="ds-list">
+        ${done.map(c   => `<div class="ds-item ds-done">${c.emoji} ${c.name}</div>`).join('')}
+        ${missed.map(c => `<div class="ds-item ds-missed">${c.emoji} ${c.name}</div>`).join('')}
+      </div>
+    </div>`;
+}
+
 document.getElementById('week-prev').addEventListener('click', () => { calWeekOffset--; renderWeekStrip(); });
 document.getElementById('week-next').addEventListener('click', () => { calWeekOffset++; renderWeekStrip(); });
-document.getElementById('cal-today-btn').addEventListener('click', () => { calWeekOffset = 0; renderWeekStrip(); });
+document.getElementById('cal-today-btn').addEventListener('click', () => {
+  calWeekOffset = 0; selectedDay = today();
+  renderWeekStrip(); renderDaySummary();
+});
 
 /* ── HOME ── */
 function renderHome(animate = true) {
+  if (!selectedDay) selectedDay = today();
   document.getElementById('user-name-display').textContent = state.user.name;
   renderWeekStrip();
+  renderDaySummary();
   renderGoalsList(animate);
   renderChallengesHome(animate);
 }
