@@ -14,7 +14,9 @@ const CATEGORIES = [
   { id: 'sleep',      name: 'Sommeil',    emoji: '😴', color: 'blue'   },
 ];
 
-const DAYS_FR = ['D','L','M','M','J','V','S'];
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAY_SHORT   = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+let calWeekOffset = 0;
 
 const GOAL_COLORS = [
   { border: '#F97316', bg: '#FFF7ED' }, // orange
@@ -188,23 +190,55 @@ function renderCurrentTab(id, animate = true) {
   if (id === 'tab-add')      renderAddTab();
 }
 
-/* ── WEEK STRIP ── */
+/* ── WEEK CALENDAR ── */
+function getMondayOfWeek(offset) {
+  const now  = new Date();
+  const day  = now.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  const mon  = new Date(now);
+  mon.setHours(0, 0, 0, 0);
+  mon.setDate(now.getDate() + diff + offset * 7);
+  return mon;
+}
+
 function renderWeekStrip() {
   const strip = document.getElementById('week-strip');
-  const now   = new Date();
+  if (!strip) return;
+  const monday   = getMondayOfWeek(calWeekOffset);
+  const todayStr = today();
+
+  /* Month label: use Thursday (mid-week) to decide which month to show */
+  const thu = new Date(monday);
+  thu.setDate(monday.getDate() + 3);
+  const lbl = document.getElementById('week-month-label');
+  if (lbl) lbl.textContent = MONTH_NAMES[thu.getMonth()];
+
+  /* Collect days with at least one completed challenge for the orange dot */
+  const doneDates = new Set();
+  state.challenges.forEach(c => (c.completions || []).forEach(d => doneDates.add(d)));
+
   strip.innerHTML = '';
-  for (let i = -3; i <= 3; i++) {
-    const d    = new Date(now);
-    d.setDate(now.getDate() + i);
-    const pill = document.createElement('div');
-    pill.className = 'day-pill' + (i === 0 ? ' today' : i < 0 ? ' past' : '');
-    pill.innerHTML = `
-      <span class="day-letter">${DAYS_FR[d.getDay()]}</span>
-      <span class="day-num">${d.getDate()}</span>
-    `;
-    strip.appendChild(pill);
+  for (let i = 0; i < 7; i++) {
+    const d    = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    const dStr    = d.toISOString().slice(0, 10);
+    const isToday = dStr === todayStr;
+    const isPast  = dStr < todayStr;
+    const hasDone = doneDates.has(dStr);
+
+    const col = document.createElement('div');
+    col.className = `day-col${isToday ? ' today' : isPast ? ' past' : ' future'}`;
+    col.innerHTML = `
+      <span class="day-col-name">${DAY_SHORT[i]}</span>
+      <div class="day-col-num-wrap"><span class="day-col-num">${d.getDate()}</span></div>
+      <div class="day-dot${hasDone ? ' done' : ''}"></div>`;
+    strip.appendChild(col);
   }
 }
+
+document.getElementById('week-prev').addEventListener('click', () => { calWeekOffset--; renderWeekStrip(); });
+document.getElementById('week-next').addEventListener('click', () => { calWeekOffset++; renderWeekStrip(); });
+document.getElementById('cal-today-btn').addEventListener('click', () => { calWeekOffset = 0; renderWeekStrip(); });
 
 /* ── HOME ── */
 function renderHome(animate = true) {

@@ -304,29 +304,87 @@ body {
 .user-name  { font-size: 14px; font-weight: 600; }
 
 /* ── WEEK STRIP ── */
-.week-strip {
-  display: flex; gap: 6px;
-  padding: 14px 20px;
-  overflow-x: auto;
-  background: linear-gradient(160deg, #FFF7ED 0%, #FAFAFA 100%);
+/* ── WEEK CALENDAR ── */
+.week-cal {
+  background: white;
+  border-radius: 20px;
+  margin: 0 16px 8px;
+  padding: 16px 12px 14px;
+  box-shadow: var(--shadow-sm);
 }
-.week-strip::-webkit-scrollbar { display: none; }
-.day-pill {
-  display: flex; flex-direction: column; align-items: center; gap: 4px;
-  min-width: 42px;
+
+.week-cal-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
 }
-.day-letter { font-size: 11px; font-weight: 600; color: var(--gray); text-transform: uppercase; }
-.day-num {
-  width: 38px; height: 38px; border-radius: 50%;
-  background: var(--dark); color: white;
+
+.week-month-nav {
+  display: flex; align-items: center; gap: 2px;
+}
+
+.week-nav-btn {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: none; border: none; cursor: pointer;
+  font-size: 20px; line-height: 1; color: var(--gray);
   display: flex; align-items: center; justify-content: center;
-  font-size: 13px; font-weight: 700;
+  transition: background .15s, color .15s;
 }
-.day-pill.today .day-num {
-  background: var(--orange);
-  box-shadow: 0 4px 12px rgba(249,115,22,0.4);
+.week-nav-btn:hover { background: var(--gray-l); color: var(--dark); }
+
+.week-month-lbl {
+  display: flex; align-items: center; gap: 5px;
+  background: none; border: none; cursor: pointer;
+  font-size: 16px; font-weight: 700; color: var(--dark);
+  font-family: var(--font-sans); padding: 0 6px;
 }
-.day-pill.past .day-num { background: var(--gray-l); color: var(--gray); }
+.week-month-lbl svg { color: var(--gray); }
+
+.cal-today-btn {
+  width: 34px; height: 34px; border-radius: 10px;
+  background: var(--gray-l); border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--dark); transition: background .15s;
+}
+.cal-today-btn:hover { background: var(--border); }
+
+.week-days {
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.day-col {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  cursor: pointer; padding: 2px 0;
+  border-radius: 12px;
+  transition: background .15s;
+}
+.day-col:hover:not(.today) { background: var(--gray-l); }
+
+.day-col-name {
+  font-size: 11px; font-weight: 500; color: var(--gray);
+}
+.day-col.today .day-col-name { font-weight: 700; color: var(--dark); }
+
+.day-col-num-wrap {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+.day-col.today .day-col-num-wrap {
+  background: var(--dark);
+}
+
+.day-col-num {
+  font-size: 14px; font-weight: 600; color: var(--dark);
+}
+.day-col.today  .day-col-num { color: white; font-weight: 700; }
+.day-col.past   .day-col-num { color: var(--gray); font-weight: 500; }
+.day-col.future .day-col-num { color: var(--gray); font-weight: 500; }
+
+.day-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: transparent;
+}
+.day-dot.done { background: var(--orange); }
 
 /* ── SECTIONS ── */
 .section { padding: 16px 20px 8px; }
