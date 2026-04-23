@@ -1245,6 +1245,7 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
   btn.addEventListener('click', () => showTab(btn.dataset.tab));
 });
 document.getElementById('nav-fab').addEventListener('click', () => showTab('tab-add'));
+document.getElementById('home-avatar-btn').addEventListener('click', () => showTab('tab-profile'));
 
 /* ── PROFILE ACTIONS ── */
 document.getElementById('edit-name-btn').addEventListener('click', () => {
