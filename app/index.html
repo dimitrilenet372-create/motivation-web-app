@@ -78,19 +78,23 @@
           <h2 class="page-title">Add a challenge</h2>
         </div>
         <div class="cat-grid" id="add-cat-grid"></div>
-        <!-- Suggestions de noms par catégorie -->
-        <div id="add-suggestions" class="suggestions-wrap hidden"></div>
         <div id="add-form" class="add-form hidden">
+          <!-- 1. Nom -->
           <h3 class="form-label">Nom du challenge</h3>
           <input type="text" id="new-name" class="app-input" placeholder="Ex: Méditation"/>
-          <!-- Sous-type par catégorie -->
+          <!-- 2. Suggestions -->
+          <div id="add-suggestions" class="suggestions-wrap hidden"></div>
+          <!-- 3. Type / sous-type -->
           <div id="add-subtype-wrap" class="hidden">
-            <h3 class="form-label" id="add-subtype-label">Type</h3>
+            <h3 class="form-label">Type</h3>
             <div class="subtype-chips" id="add-subtype-chips"></div>
           </div>
-          <!-- Durée par session (méditation, lecture, sport…) -->
+          <!-- 4. Durée optionnelle -->
           <div id="add-duration-wrap" class="hidden">
-            <h3 class="form-label" id="add-duration-label">Durée par session</h3>
+            <div class="dur-toggle-row">
+              <h3 class="form-label">Durée par session</h3>
+              <button type="button" class="dur-remove-btn" id="dur-remove">✕</button>
+            </div>
             <div class="counter-row">
               <button type="button" class="counter-btn" id="dur-minus">−</button>
               <input type="number" class="counter-val" id="dur-val" value="20" min="1" max="240"/>
@@ -104,11 +108,13 @@
               <button class="preset-btn" data-mins="60">1 h</button>
             </div>
           </div>
-          <!-- Heure de coucher (sommeil) -->
+          <button type="button" class="btn-add-opt hidden" id="dur-add-btn">+ Ajouter une durée</button>
+          <!-- 5. Heure de coucher (sommeil uniquement) -->
           <div id="add-bedtime-wrap" class="hidden">
             <h3 class="form-label">Heure de coucher cible</h3>
             <input type="time" id="add-bedtime" class="app-input time-input" value="22:30"/>
           </div>
+          <!-- 6. Jours cibles -->
           <h3 class="form-label">Jours cibles</h3>
           <div class="counter-row">
             <button type="button" class="counter-btn" id="t-minus">−</button>
@@ -122,7 +128,7 @@
           </div>
           <button class="btn-orange-full" id="save-challenge">Ajouter le challenge</button>
         </div>
-        <div style="height:90px"></div>
+        <div style="height:120px"></div>
       </div>
     </div>
 

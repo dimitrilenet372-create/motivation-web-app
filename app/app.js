@@ -510,6 +510,16 @@ function syncDurPresets(val) {
   });
 }
 
+function showDurPicker() {
+  document.getElementById('add-duration-wrap').classList.remove('hidden');
+  document.getElementById('dur-add-btn').classList.add('hidden');
+}
+function hideDurPicker() {
+  document.getElementById('add-duration-wrap').classList.add('hidden');
+  document.getElementById('dur-add-btn').classList.remove('hidden');
+  addDuration = 20;
+}
+
 function renderAddTab() {
   addSelectedCat = null;
   addTarget      = 365;
@@ -521,6 +531,8 @@ function renderAddTab() {
   document.getElementById('add-form').classList.add('hidden');
   document.getElementById('add-suggestions').classList.add('hidden');
   document.getElementById('add-suggestions').innerHTML = '';
+  document.getElementById('add-duration-wrap').classList.add('hidden');
+  document.getElementById('dur-add-btn').classList.add('hidden');
 
   buildCatGrid('add-cat-grid', (cat) => {
     addSelectedCat = cat;
@@ -528,7 +540,7 @@ function renderAddTab() {
     document.getElementById('new-name').value = cat.name;
     document.getElementById('add-form').classList.remove('hidden');
 
-    /* Suggestions */
+    /* 1. Suggestions de noms */
     const sugs = CHALLENGE_SUGGESTIONS[cat.id] || [];
     const sugWrap = document.getElementById('add-suggestions');
     if (sugs.length) {
@@ -537,14 +549,14 @@ function renderAddTab() {
       sugWrap.classList.remove('hidden');
       sugWrap.querySelectorAll('.suggestion-chip').forEach(chip => {
         chip.addEventListener('click', () => {
-          document.getElementById('new-name').value = chip.textContent;
+          document.getElementById('new-name').value = chip.textContent.trim();
         });
       });
     } else {
       sugWrap.classList.add('hidden');
     }
 
-    /* Sub-types */
+    /* 2. Sous-types */
     const subtypes = CATEGORY_SUBTYPES[cat.id] || [];
     const stWrap   = document.getElementById('add-subtype-wrap');
     const stChips  = document.getElementById('add-subtype-chips');
@@ -563,20 +575,24 @@ function renderAddTab() {
       stWrap.classList.add('hidden');
     }
 
-    /* Duration */
-    const durWrap = document.getElementById('add-duration-wrap');
+    /* 3. Durée : optionnelle, affichée via bouton pour les catégories compatibles */
+    addDuration = 20;
+    document.getElementById('dur-val').value = addDuration;
+    syncDurPresets(addDuration);
+    document.getElementById('add-duration-wrap').classList.add('hidden');
     if (HAS_DURATION.has(cat.id)) {
-      document.getElementById('dur-val').value = addDuration;
-      syncDurPresets(addDuration);
-      durWrap.classList.remove('hidden');
+      document.getElementById('dur-add-btn').classList.remove('hidden');
     } else {
-      durWrap.classList.add('hidden');
+      document.getElementById('dur-add-btn').classList.add('hidden');
     }
 
-    /* Bedtime */
+    /* 4. Heure de coucher (sommeil uniquement) */
     const btWrap = document.getElementById('add-bedtime-wrap');
     HAS_BEDTIME.has(cat.id) ? btWrap.classList.remove('hidden') : btWrap.classList.add('hidden');
   });
+
+  document.getElementById('dur-add-btn').onclick = showDurPicker;
+  document.getElementById('dur-remove').onclick   = hideDurPicker;
 }
 
 function buildCatGrid(containerId, onSelect) {

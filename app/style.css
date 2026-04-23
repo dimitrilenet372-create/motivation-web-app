@@ -271,11 +271,12 @@ body {
   min-height: 0;
 }
 .tab {
-  display: none; flex: 1; overflow: hidden; flex-direction: column;
+  display: none; flex: 1; min-height: 0; flex-direction: column;
 }
 .tab.active { display: flex; }
 .app-scroll {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
@@ -823,6 +824,25 @@ body {
 
 /* Time input */
 .time-input { font-size: 22px !important; text-align: center; letter-spacing: 2px; }
+
+/* Durée optionnelle */
+.btn-add-opt {
+  background: none; border: 1.5px dashed var(--gray-l);
+  border-radius: 12px; padding: 10px 16px;
+  font-family: var(--font-sans); font-size: 13px; font-weight: 600;
+  color: var(--gray); cursor: pointer; text-align: left;
+  transition: border-color 0.15s, color 0.15s;
+}
+.btn-add-opt:hover { border-color: var(--orange); color: var(--orange); }
+.dur-toggle-row {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.dur-remove-btn {
+  background: none; border: none; cursor: pointer;
+  color: var(--gray); font-size: 14px; padding: 2px 6px;
+  border-radius: 8px; transition: color 0.15s;
+}
+.dur-remove-btn:hover { color: var(--c-red); }
 
 /* ── BOTTOM NAV — pill flottant ── */
 .bottom-nav {
