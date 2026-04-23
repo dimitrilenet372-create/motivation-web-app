@@ -78,11 +78,11 @@ body {
   .screen {
     position: relative;
     inset: auto;
-    width: 390px;
-    height: min(844px, 95vh);
-    border-radius: 44px;
+    width: 393px;
+    height: min(852px, 95vh);
+    border-radius: 50px;
     overflow: hidden;
-    box-shadow: 0 32px 80px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.08);
+    box-shadow: 0 40px 100px rgba(0,0,0,0.3), 0 0 0 1px rgba(0,0,0,0.1);
     flex-shrink: 0;
   }
   .screen.active { display: flex; }
@@ -95,8 +95,18 @@ body {
     z-index: -1;
   }
 
+  /* Sur desktop, la nav est dans le cadre (position absolute sur #app) */
   .bottom-nav {
-    border-radius: 0 0 44px 44px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 0 0 50px 50px;
+  }
+
+  /* Le FAB sort au-dessus de la nav mais reste dans le cadre */
+  .nav-fab {
+    top: -28px;
   }
 }
 
@@ -256,8 +266,13 @@ body {
    APP SHELL
 ══════════════════════════════════════════ */
 #app {
-  background: var(--bg-off);
+  display: flex;
+  flex: 1;
   flex-direction: column;
+  background: var(--bg-off);
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
 }
 .tab {
   display: none; flex: 1; overflow: hidden; flex-direction: column;
@@ -828,6 +843,7 @@ body {
   padding-top: 10px;
   z-index: 100;
   overflow: visible;
+  flex-shrink: 0;
 }
 .nav-btn {
   flex: 1; background: none; border: none;
