@@ -21,7 +21,10 @@
 
   <!-- ── ONBOARDING ── -->
   <div id="onboarding" class="screen">
-    <div class="ob-wrap">
+    <div class="ob-progress"><div class="ob-prog-bar" id="ob-prog-bar" style="width:50%"></div></div>
+
+    <!-- STEP 1 — Challenges -->
+    <div id="ob-step1" class="ob-wrap">
       <div class="ob-logo">
         <div class="mini-sun"><div class="mini-inner"><div class="mini-dot"></div></div></div>
         <span>Perfect day</span>
@@ -32,7 +35,37 @@
       <div class="ob-name-row">
         <input type="text" id="ob-name" class="app-input" placeholder="Ton prénom"/>
       </div>
-      <button class="btn-dark-full" id="ob-next" disabled>Commencer →</button>
+      <button class="btn-dark-full" id="ob-next" disabled>Suivant →</button>
+    </div>
+
+    <!-- STEP 2 — Goals -->
+    <div id="ob-step2" class="ob-wrap hidden">
+      <div class="ob-logo">
+        <div class="mini-sun"><div class="mini-inner"><div class="mini-dot"></div></div></div>
+        <span>Perfect day</span>
+      </div>
+      <h1 class="ob-title">Tes<br>goals</h1>
+      <p class="ob-sub">Définis tes objectifs à long terme (optionnel)</p>
+
+      <div id="ob-goals-list" class="ob-goals-list"></div>
+
+      <!-- Inline goal form -->
+      <div id="ob-goal-form" class="ob-goal-form hidden">
+        <div class="cat-grid small" id="ob-goal-cat-grid"></div>
+        <input type="text" id="ob-goal-name" class="app-input" placeholder="Nom du goal…"/>
+        <div class="target-presets" id="ob-goal-presets">
+          <button class="preset-btn" data-days="30">1 mois</button>
+          <button class="preset-btn" data-days="90">3 mois</button>
+          <button class="preset-btn active" data-days="365">1 an</button>
+          <button class="preset-btn" data-days="1825">5 ans</button>
+        </div>
+        <button class="btn-orange-full" id="ob-goal-confirm">Ajouter</button>
+        <button class="btn-ghost" id="ob-goal-cancel">Annuler</button>
+      </div>
+
+      <button class="btn-outline-sm" id="ob-open-goal-form">+ Ajouter un goal</button>
+      <button class="btn-dark-full" id="ob-start">Commencer ! →</button>
+      <button class="btn-ghost ob-back-btn" id="ob-back">← Retour</button>
     </div>
   </div>
 

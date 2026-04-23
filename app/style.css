@@ -178,6 +178,51 @@ body {
 }
 .ob-sub { font-size: 14px; color: var(--gray); margin-top: -10px; }
 .ob-name-row { display: flex; flex-direction: column; gap: 8px; }
+.ob-back-btn { text-align: center; color: var(--gray); font-size: 14px; }
+
+/* Step progress bar */
+.ob-progress {
+  height: 3px; background: var(--gray-l);
+  flex-shrink: 0;
+}
+.ob-prog-bar {
+  height: 100%; background: var(--orange);
+  transition: width 0.45s var(--ease-out);
+}
+
+/* Goals list in step 2 */
+.ob-goals-list { display: flex; flex-direction: column; gap: 8px; }
+
+.ob-goal-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px;
+  background: var(--bg-off);
+  border-radius: 14px;
+  border: 1.5px solid var(--border);
+  animation: fadeSlideUp 0.2s ease-out both;
+}
+.ob-goal-emoji { font-size: 22px; flex-shrink: 0; }
+.ob-goal-text  { flex: 1; }
+.ob-goal-name  { font-size: 14px; font-weight: 600; color: var(--dark); }
+.ob-goal-dur   { font-size: 11px; color: var(--gray); margin-top: 1px; }
+.ob-goal-del {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--gray-l); border: none; cursor: pointer;
+  font-size: 11px; color: var(--gray);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: background .15s;
+}
+.ob-goal-del:hover { background: var(--border); }
+
+/* Inline goal form */
+.ob-goal-form {
+  display: flex; flex-direction: column; gap: 12px;
+  padding: 16px;
+  background: var(--bg-off);
+  border-radius: 16px;
+  border: 1.5px solid var(--border);
+  animation: fadeSlideUp 0.2s ease-out both;
+}
 
 /* ── CATEGORY GRID ── */
 .cat-grid {

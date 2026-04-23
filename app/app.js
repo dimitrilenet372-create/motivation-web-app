@@ -1266,6 +1266,9 @@ document.getElementById('reset-btn').addEventListener('click', () => {
 
 /* ── ONBOARDING ── */
 const obSelected = new Set();
+let obGoals      = [];
+let obGoalCat    = null;
+let obGoalTarget = 365;
 
 function buildOnboardingGrid() {
   const grid = document.getElementById('cat-grid');
@@ -1290,29 +1293,122 @@ function updateObBtn() {
   document.getElementById('ob-next').disabled = !(name && obSelected.size > 0);
 }
 
+function fmtDays(days) {
+  if (days >= 1825) return '5 ans';
+  if (days >= 365)  return '1 an';
+  if (days >= 30)   return `${Math.round(days / 30)} mois`;
+  return `${days} jours`;
+}
+
+function syncObGoalPresets(val) {
+  document.querySelectorAll('#ob-goal-presets .preset-btn').forEach(btn => {
+    btn.classList.toggle('active', Number(btn.dataset.days) === val);
+  });
+}
+
+function renderObGoalsList() {
+  const el = document.getElementById('ob-goals-list');
+  if (!obGoals.length) { el.innerHTML = ''; return; }
+  el.innerHTML = obGoals.map((g, i) => `
+    <div class="ob-goal-item">
+      <span class="ob-goal-emoji">${g.emoji}</span>
+      <div class="ob-goal-text">
+        <div class="ob-goal-name">${g.name}</div>
+        <div class="ob-goal-dur">${fmtDays(g.target)}</div>
+      </div>
+      <button class="ob-goal-del" data-i="${i}">✕</button>
+    </div>`).join('');
+  el.querySelectorAll('.ob-goal-del').forEach(btn => {
+    btn.addEventListener('click', () => {
+      obGoals.splice(Number(btn.dataset.i), 1);
+      renderObGoalsList();
+    });
+  });
+}
+
 document.getElementById('ob-name').addEventListener('input', updateObBtn);
 
+/* Step 1 → Step 2 */
 document.getElementById('ob-next').addEventListener('click', () => {
+  if (document.getElementById('ob-next').disabled) return;
+  obGoals = [];
+  document.getElementById('ob-step1').classList.add('hidden');
+  document.getElementById('ob-step2').classList.remove('hidden');
+  document.getElementById('ob-prog-bar').style.width = '100%';
+  document.getElementById('ob-goal-form').classList.add('hidden');
+  document.getElementById('ob-open-goal-form').classList.remove('hidden');
+  renderObGoalsList();
+});
+
+/* Step 2 → Step 1 */
+document.getElementById('ob-back').addEventListener('click', () => {
+  document.getElementById('ob-step2').classList.add('hidden');
+  document.getElementById('ob-step1').classList.remove('hidden');
+  document.getElementById('ob-prog-bar').style.width = '50%';
+});
+
+/* Open goal form */
+document.getElementById('ob-open-goal-form').addEventListener('click', () => {
+  obGoalCat    = null;
+  obGoalTarget = 365;
+  document.getElementById('ob-goal-name').value = '';
+  syncObGoalPresets(365);
+  buildCatGrid('ob-goal-cat-grid', (cat) => {
+    obGoalCat = cat;
+    document.getElementById('ob-goal-name').value = cat.name;
+  });
+  document.getElementById('ob-goal-form').classList.remove('hidden');
+  document.getElementById('ob-open-goal-form').classList.add('hidden');
+});
+
+/* Cancel goal form */
+document.getElementById('ob-goal-cancel').addEventListener('click', () => {
+  document.getElementById('ob-goal-form').classList.add('hidden');
+  document.getElementById('ob-open-goal-form').classList.remove('hidden');
+});
+
+/* Goal target presets */
+document.getElementById('ob-goal-presets').addEventListener('click', e => {
+  const btn = e.target.closest('.preset-btn');
+  if (!btn) return;
+  obGoalTarget = Number(btn.dataset.days);
+  syncObGoalPresets(obGoalTarget);
+});
+
+/* Confirm add goal */
+document.getElementById('ob-goal-confirm').addEventListener('click', () => {
+  const name = document.getElementById('ob-goal-name').value.trim();
+  if (!name) return;
+  obGoals.push({
+    name,
+    emoji:  obGoalCat ? obGoalCat.emoji : '🎯',
+    color:  obGoalCat ? obGoalCat.color : 'blue',
+    target: obGoalTarget,
+  });
+  renderObGoalsList();
+  document.getElementById('ob-goal-form').classList.add('hidden');
+  document.getElementById('ob-open-goal-form').classList.remove('hidden');
+});
+
+/* Commencer — save everything and enter app */
+document.getElementById('ob-start').addEventListener('click', () => {
   const name = document.getElementById('ob-name').value.trim();
   if (!name || obSelected.size === 0) return;
-  state.user.name = name;
+  state.user.name      = name;
   state.user.onboarded = true;
   obSelected.forEach(catId => {
     const cat = CATEGORIES.find(c => c.id === catId);
-    if (cat) {
-      state.challenges.push({
-        id: uid(),
-        name: cat.name,
-        emoji: cat.emoji,
-        color: cat.color,
-        category: cat.id,
-        progress: 0,
-        target: 365,
-        completions: [],
-        createdAt: today(),
-      });
-    }
+    if (cat) state.challenges.push({
+      id: uid(), name: cat.name, emoji: cat.emoji,
+      color: cat.color, category: cat.id,
+      progress: 0, target: 365,
+      completions: [], createdAt: today(),
+    });
   });
+  obGoals.forEach(g => state.goals.push({
+    id: uid(), name: g.name, emoji: g.emoji,
+    color: g.color, progress: 0, target: g.target,
+  }));
   save();
   enterApp();
 });
