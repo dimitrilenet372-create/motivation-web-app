@@ -72,30 +72,6 @@ body {
 }
 .screen.active { display: flex; }
 
-@media (min-width: 600px) {
-  body { display: flex; align-items: center; justify-content: center; }
-
-  .screen {
-    position: relative;
-    inset: auto;
-    width: 390px;
-    height: min(844px, 95vh);
-    border-radius: 44px;
-    overflow: hidden;
-    box-shadow: 0 32px 80px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.08);
-    flex-shrink: 0;
-  }
-  .screen.active { display: flex; }
-
-  /* Wallpaper behind the phone */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: radial-gradient(ellipse at 30% 40%, var(--orange-l) 0%, var(--bg-warm) 50%, var(--c-blue-bg) 100%);
-    z-index: -1;
-  }
-}
 
 /* ── SPLASH ── */
 #splash {
