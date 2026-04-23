@@ -588,9 +588,13 @@ function renderAddTab() {
       document.getElementById('dur-add-btn').classList.add('hidden');
     }
 
-    /* 4. Heure de coucher (sommeil uniquement) */
+    /* 4. Heure de coucher — UNIQUEMENT catégorie sleep */
     const btWrap = document.getElementById('add-bedtime-wrap');
-    HAS_BEDTIME.has(cat.id) ? btWrap.classList.remove('hidden') : btWrap.classList.add('hidden');
+    if (cat.id === 'sleep') {
+      btWrap.classList.remove('hidden');
+    } else {
+      btWrap.classList.add('hidden');
+    }
   });
 
   document.getElementById('dur-add-btn').onclick = showDurPicker;
