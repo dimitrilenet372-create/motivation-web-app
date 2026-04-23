@@ -72,13 +72,17 @@ body {
   flex-direction: column;
 }
 .screen.active { display: flex; }
+/* Sécurité absolue : jamais deux écrans visibles en même temps */
+.screen:not(.active) { display: none !important; }
 
 @media (min-width: 600px) {
   body { display: flex; align-items: center; justify-content: center; }
 
-  .screen {
+  .screen:not(.active) { display: none !important; }
+  .screen.active {
     position: relative;
     inset: auto;
+    display: flex;
     width: 393px;
     height: min(852px, 95vh);
     border-radius: 50px;
@@ -86,7 +90,6 @@ body {
     box-shadow: 0 40px 100px rgba(0,0,0,0.3), 0 0 0 1px rgba(0,0,0,0.1);
     flex-shrink: 0;
   }
-  .screen.active { display: flex; }
 
   body::before {
     content: '';
