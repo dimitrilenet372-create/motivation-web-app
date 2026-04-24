@@ -790,10 +790,10 @@ body {
 .counter-btn:hover  { background: var(--border); }
 .counter-btn:active { transform: scale(0.9); }
 .counter-val {
-  font-family: var(--font-serif);
-  font-size: 48px; font-weight: 700;
-  width: 120px; text-align: center;
-  color: var(--orange);
+  font-family: var(--font-sans);
+  font-size: 22px; font-weight: 700;
+  width: 80px; text-align: center;
+  color: var(--dark);
   border: none; background: transparent; outline: none;
   -moz-appearance: textfield;
 }
