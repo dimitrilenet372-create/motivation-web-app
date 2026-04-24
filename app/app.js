@@ -1265,10 +1265,18 @@ document.getElementById('reset-btn').addEventListener('click', () => {
 });
 
 /* ── ONBOARDING ── */
-const obSelected = new Set();
-let obGoals      = [];
-let obGoalCat    = null;
-let obGoalTarget = 365;
+let obChallenges = [];   // list of configured challenges
+let obCurrentCat = null; // category currently open in form
+let obChTarget   = 365;
+let obChDuration = 20;
+let obChSubtype  = '';
+
+function fmtDays(days) {
+  if (days >= 1825) return '5 ans';
+  if (days >= 365)  return '1 an';
+  if (days >= 30)   return `${Math.round(days / 30)} mois`;
+  return `${days} jours`;
+}
 
 function buildOnboardingGrid() {
   const grid = document.getElementById('cat-grid');
@@ -1279,136 +1287,167 @@ function buildOnboardingGrid() {
     </div>`).join('');
   grid.querySelectorAll('.cat-item').forEach(item => {
     item.addEventListener('click', () => {
-      item.classList.toggle('selected');
-      const id = item.dataset.id;
-      if (obSelected.has(id)) obSelected.delete(id);
-      else obSelected.add(id);
-      updateObBtn();
+      const cat = CATEGORIES.find(c => c.id === item.dataset.id);
+      if (!cat) return;
+      if (obCurrentCat && obCurrentCat.id === cat.id) { closeObForm(); return; }
+      openObForm(cat);
     });
   });
 }
 
-function updateObBtn() {
-  const name = document.getElementById('ob-name').value.trim();
-  document.getElementById('ob-next').disabled = !(name && obSelected.size > 0);
+function openObForm(cat) {
+  obCurrentCat = cat;
+  obChTarget   = 365;
+  obChDuration = 20;
+  obChSubtype  = '';
+
+  document.querySelectorAll('#cat-grid .cat-item').forEach(el => {
+    if (!el.classList.contains('done'))
+      el.classList.toggle('selected', el.dataset.id === cat.id);
+  });
+
+  document.getElementById('ob-form-emoji').textContent = cat.emoji;
+  document.getElementById('ob-ch-name').value = cat.name;
+
+  /* Subtypes */
+  const subtypes = CATEGORY_SUBTYPES[cat.id] || [];
+  const stWrap  = document.getElementById('ob-ch-subtype-wrap');
+  const stChips = document.getElementById('ob-ch-subtype-chips');
+  if (subtypes.length) {
+    stChips.innerHTML = subtypes.map(s =>
+      `<button class="subtype-chip" data-val="${s}">${s}</button>`).join('');
+    stWrap.classList.remove('hidden');
+    stChips.querySelectorAll('.subtype-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        stChips.querySelectorAll('.subtype-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        obChSubtype = chip.dataset.val;
+      });
+    });
+  } else {
+    stWrap.classList.add('hidden');
+  }
+
+  /* Duration */
+  const durWrap = document.getElementById('ob-ch-dur-wrap');
+  if (HAS_DURATION.has(cat.id)) {
+    syncObDurPresets(obChDuration);
+    durWrap.classList.remove('hidden');
+  } else {
+    durWrap.classList.add('hidden');
+  }
+  syncObTargetPresets(obChTarget);
+
+  const form = document.getElementById('ob-ch-form');
+  form.classList.remove('hidden');
+  setTimeout(() => form.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 60);
 }
 
-function fmtDays(days) {
-  if (days >= 1825) return '5 ans';
-  if (days >= 365)  return '1 an';
-  if (days >= 30)   return `${Math.round(days / 30)} mois`;
-  return `${days} jours`;
+function closeObForm() {
+  document.getElementById('ob-ch-form').classList.add('hidden');
+  if (obCurrentCat) {
+    const el = document.querySelector(`#cat-grid .cat-item[data-id="${obCurrentCat.id}"]`);
+    if (el && !el.classList.contains('done')) el.classList.remove('selected');
+  }
+  obCurrentCat = null;
 }
 
-function syncObGoalPresets(val) {
-  document.querySelectorAll('#ob-goal-presets .preset-btn').forEach(btn => {
+function syncObTargetPresets(val) {
+  document.querySelectorAll('#ob-target-presets .preset-btn').forEach(btn => {
     btn.classList.toggle('active', Number(btn.dataset.days) === val);
   });
 }
+function syncObDurPresets(val) {
+  document.querySelectorAll('#ob-dur-presets .preset-btn').forEach(btn => {
+    btn.classList.toggle('active', Number(btn.dataset.mins) === val);
+  });
+}
 
-function renderObGoalsList() {
-  const el = document.getElementById('ob-goals-list');
-  if (!obGoals.length) { el.innerHTML = ''; return; }
-  el.innerHTML = obGoals.map((g, i) => `
-    <div class="ob-goal-item">
-      <span class="ob-goal-emoji">${g.emoji}</span>
-      <div class="ob-goal-text">
-        <div class="ob-goal-name">${g.name}</div>
-        <div class="ob-goal-dur">${fmtDays(g.target)}</div>
+function renderObChallengesList() {
+  const el = document.getElementById('ob-challenges-list');
+  if (!obChallenges.length) { el.innerHTML = ''; return; }
+  el.innerHTML = obChallenges.map((c, i) => `
+    <div class="ob-ch-item">
+      <span class="ob-ch-emoji">${c.emoji}</span>
+      <div class="ob-ch-info">
+        <div class="ob-ch-name-txt">${c.name}</div>
+        <div class="ob-ch-meta">${c.duration ? c.duration + ' min · ' : ''}${fmtDays(c.target)}</div>
       </div>
       <button class="ob-goal-del" data-i="${i}">✕</button>
     </div>`).join('');
   el.querySelectorAll('.ob-goal-del').forEach(btn => {
     btn.addEventListener('click', () => {
-      obGoals.splice(Number(btn.dataset.i), 1);
-      renderObGoalsList();
+      const removed = obChallenges.splice(Number(btn.dataset.i), 1)[0];
+      if (removed) {
+        const catEl = document.querySelector(`#cat-grid .cat-item[data-id="${removed.catId}"]`);
+        if (catEl) catEl.classList.remove('done', 'selected');
+      }
+      renderObChallengesList();
+      updateObStartBtn();
     });
   });
 }
 
-document.getElementById('ob-name').addEventListener('input', updateObBtn);
+function updateObStartBtn() {
+  const name = document.getElementById('ob-name').value.trim();
+  document.getElementById('ob-start').disabled = !(name && obChallenges.length > 0);
+}
 
-/* Step 1 → Step 2 */
-document.getElementById('ob-next').addEventListener('click', () => {
-  if (document.getElementById('ob-next').disabled) return;
-  obGoals = [];
-  document.getElementById('ob-step1').classList.add('hidden');
-  document.getElementById('ob-step2').classList.remove('hidden');
-  document.getElementById('ob-prog-bar').style.width = '100%';
-  document.getElementById('ob-goal-form').classList.add('hidden');
-  document.getElementById('ob-open-goal-form').classList.remove('hidden');
-  renderObGoalsList();
-});
+document.getElementById('ob-name').addEventListener('input', updateObStartBtn);
 
-/* Step 2 → Step 1 */
-document.getElementById('ob-back').addEventListener('click', () => {
-  document.getElementById('ob-step2').classList.add('hidden');
-  document.getElementById('ob-step1').classList.remove('hidden');
-  document.getElementById('ob-prog-bar').style.width = '50%';
-});
-
-/* Open goal form */
-document.getElementById('ob-open-goal-form').addEventListener('click', () => {
-  obGoalCat    = null;
-  obGoalTarget = 365;
-  document.getElementById('ob-goal-name').value = '';
-  syncObGoalPresets(365);
-  buildCatGrid('ob-goal-cat-grid', (cat) => {
-    obGoalCat = cat;
-    document.getElementById('ob-goal-name').value = cat.name;
-  });
-  document.getElementById('ob-goal-form').classList.remove('hidden');
-  document.getElementById('ob-open-goal-form').classList.add('hidden');
-});
-
-/* Cancel goal form */
-document.getElementById('ob-goal-cancel').addEventListener('click', () => {
-  document.getElementById('ob-goal-form').classList.add('hidden');
-  document.getElementById('ob-open-goal-form').classList.remove('hidden');
-});
-
-/* Goal target presets */
-document.getElementById('ob-goal-presets').addEventListener('click', e => {
+document.getElementById('ob-target-presets').addEventListener('click', e => {
   const btn = e.target.closest('.preset-btn');
   if (!btn) return;
-  obGoalTarget = Number(btn.dataset.days);
-  syncObGoalPresets(obGoalTarget);
+  obChTarget = Number(btn.dataset.days);
+  syncObTargetPresets(obChTarget);
 });
 
-/* Confirm add goal */
-document.getElementById('ob-goal-confirm').addEventListener('click', () => {
-  const name = document.getElementById('ob-goal-name').value.trim();
-  if (!name) return;
-  obGoals.push({
+document.getElementById('ob-dur-presets').addEventListener('click', e => {
+  const btn = e.target.closest('.preset-btn');
+  if (!btn) return;
+  obChDuration = Number(btn.dataset.mins);
+  syncObDurPresets(obChDuration);
+});
+
+document.getElementById('ob-ch-cancel').addEventListener('click', closeObForm);
+
+document.getElementById('ob-ch-confirm').addEventListener('click', () => {
+  const name = document.getElementById('ob-ch-name').value.trim();
+  if (!name || !obCurrentCat) return;
+  const cat = obCurrentCat;
+  obChallenges.push({
+    catId:    cat.id,
     name,
-    emoji:  obGoalCat ? obGoalCat.emoji : '🎯',
-    color:  obGoalCat ? obGoalCat.color : 'blue',
-    target: obGoalTarget,
+    emoji:    cat.emoji,
+    color:    cat.color,
+    category: cat.id,
+    subtype:  obChSubtype || '',
+    duration: HAS_DURATION.has(cat.id) ? obChDuration : null,
+    target:   obChTarget,
   });
-  renderObGoalsList();
-  document.getElementById('ob-goal-form').classList.add('hidden');
-  document.getElementById('ob-open-goal-form').classList.remove('hidden');
+  const catEl = document.querySelector(`#cat-grid .cat-item[data-id="${cat.id}"]`);
+  if (catEl) { catEl.classList.remove('selected'); catEl.classList.add('done'); }
+  closeObForm();
+  renderObChallengesList();
+  updateObStartBtn();
 });
 
-/* Commencer — save everything and enter app */
 document.getElementById('ob-start').addEventListener('click', () => {
   const name = document.getElementById('ob-name').value.trim();
-  if (!name || obSelected.size === 0) return;
+  if (!name || obChallenges.length === 0) return;
   state.user.name      = name;
   state.user.onboarded = true;
-  obSelected.forEach(catId => {
-    const cat = CATEGORIES.find(c => c.id === catId);
-    if (cat) state.challenges.push({
-      id: uid(), name: cat.name, emoji: cat.emoji,
-      color: cat.color, category: cat.id,
-      progress: 0, target: 365,
+  obChallenges.forEach(c => {
+    state.challenges.push({
+      id: uid(), name: c.name, emoji: c.emoji,
+      color: c.color, category: c.catId,
+      subtype:  c.subtype || '',
+      duration: c.duration || null,
+      bedtime:  null,
+      progress: 0, target: c.target,
       completions: [], createdAt: today(),
     });
   });
-  obGoals.forEach(g => state.goals.push({
-    id: uid(), name: g.name, emoji: g.emoji,
-    color: g.color, progress: 0, target: g.target,
-  }));
   save();
   enterApp();
 });

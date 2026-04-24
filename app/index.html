@@ -21,10 +21,7 @@
 
   <!-- ── ONBOARDING ── -->
   <div id="onboarding" class="screen">
-    <div class="ob-progress"><div class="ob-prog-bar" id="ob-prog-bar" style="width:50%"></div></div>
-
-    <!-- STEP 1 — Challenges -->
-    <div id="ob-step1" class="ob-wrap">
+    <div class="ob-wrap">
       <div class="ob-logo">
         <div class="mini-sun"><div class="mini-inner"><div class="mini-dot"></div></div></div>
         <span>Perfect day</span>
@@ -32,40 +29,44 @@
       <h1 class="ob-title">What did you<br>want to track?</h1>
       <p class="ob-sub">Choose some challenges</p>
       <div class="cat-grid" id="cat-grid"></div>
-      <div class="ob-name-row">
-        <input type="text" id="ob-name" class="app-input" placeholder="Ton prénom"/>
-      </div>
-      <button class="btn-dark-full" id="ob-next" disabled>Suivant →</button>
-    </div>
 
-    <!-- STEP 2 — Goals -->
-    <div id="ob-step2" class="ob-wrap hidden">
-      <div class="ob-logo">
-        <div class="mini-sun"><div class="mini-inner"><div class="mini-dot"></div></div></div>
-        <span>Perfect day</span>
-      </div>
-      <h1 class="ob-title">Tes<br>goals</h1>
-      <p class="ob-sub">Définis tes objectifs à long terme (optionnel)</p>
-
-      <div id="ob-goals-list" class="ob-goals-list"></div>
-
-      <!-- Inline goal form -->
-      <div id="ob-goal-form" class="ob-goal-form hidden">
-        <div class="cat-grid small" id="ob-goal-cat-grid"></div>
-        <input type="text" id="ob-goal-name" class="app-input" placeholder="Nom du goal…"/>
-        <div class="target-presets" id="ob-goal-presets">
+      <!-- Inline challenge personalization form -->
+      <div id="ob-ch-form" class="ob-ch-form hidden">
+        <div class="ob-ch-form-header">
+          <span class="ob-ch-form-emoji" id="ob-form-emoji">🏃</span>
+          <input type="text" id="ob-ch-name" class="app-input" placeholder="Nom du challenge"/>
+        </div>
+        <div id="ob-ch-subtype-wrap" class="hidden">
+          <div class="subtype-chips" id="ob-ch-subtype-chips"></div>
+        </div>
+        <div id="ob-ch-dur-wrap" class="hidden">
+          <h3 class="form-label">Durée par session</h3>
+          <div class="target-presets" id="ob-dur-presets">
+            <button class="preset-btn" data-mins="10">10 min</button>
+            <button class="preset-btn active" data-mins="20">20 min</button>
+            <button class="preset-btn" data-mins="30">30 min</button>
+            <button class="preset-btn" data-mins="60">1 h</button>
+          </div>
+        </div>
+        <h3 class="form-label">Durée de l'objectif</h3>
+        <div class="target-presets" id="ob-target-presets">
           <button class="preset-btn" data-days="30">1 mois</button>
           <button class="preset-btn" data-days="90">3 mois</button>
           <button class="preset-btn active" data-days="365">1 an</button>
-          <button class="preset-btn" data-days="1825">5 ans</button>
         </div>
-        <button class="btn-orange-full" id="ob-goal-confirm">Ajouter</button>
-        <button class="btn-ghost" id="ob-goal-cancel">Annuler</button>
+        <div class="ob-ch-form-btns">
+          <button class="btn-ghost" id="ob-ch-cancel">Annuler</button>
+          <button class="btn-orange-full" id="ob-ch-confirm">Ajouter →</button>
+        </div>
       </div>
 
-      <button class="btn-outline-sm" id="ob-open-goal-form">+ Ajouter un goal</button>
-      <button class="btn-dark-full" id="ob-start">Commencer ! →</button>
-      <button class="btn-ghost ob-back-btn" id="ob-back">← Retour</button>
+      <!-- List of added challenges -->
+      <div id="ob-challenges-list"></div>
+
+      <div class="ob-name-row">
+        <input type="text" id="ob-name" class="app-input" placeholder="Ton prénom"/>
+      </div>
+      <button class="btn-dark-full" id="ob-start" disabled>Commencer ! →</button>
     </div>
   </div>
 
